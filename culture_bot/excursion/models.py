@@ -76,6 +76,13 @@ class ReviewOnRoute(Reviews):
         verbose_name="Комментируемый маршрут",
     )
 
+    class Meta:
+        verbose_name = "Комментарий на маршрут"
+        verbose_name_plural = "Комментарии на маршруты"
+
+    def __str__(self):
+        return self.text[1:20]
+
 
 class ReviewOnExhibit(Reviews):
     exhibit = models.ForeignKey(
@@ -84,3 +91,10 @@ class ReviewOnExhibit(Reviews):
         related_name="review_on_exhibit",
         verbose_name="Комментируемый экспонат",
     )
+
+    class Meta:
+        verbose_name = "Комментарий на экспонат"
+        verbose_name_plural = "Комментарии на экспонаты"
+
+    def __str__(self):
+        return self.text[1:20]
