@@ -2,7 +2,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 keyboard_ways = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Маршрут 1'), ],
+        [KeyboardButton(text='Маршрут 1. "Руки бы им оторвать"'), ],
         [KeyboardButton(text='Маршрут 2'), ],
         [KeyboardButton(text='Маршрут 3'), ],
         [KeyboardButton(text='О проекте'), ],
