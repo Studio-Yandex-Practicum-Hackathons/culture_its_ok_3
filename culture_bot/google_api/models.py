@@ -5,11 +5,12 @@ from excursion.models import Route, Exhibit
 
 
 class UserFeedback(models.Model):
-    telegram_id = models.BigIntegerField(unique=True)
+    telegram_id = models.CharField('user id telegram', max_length=150, blank=True)
     start_time_route = models.DateTimeField()
     end_time_route = models.DateTimeField(null=True, blank=True)
     exhibit_comment = models.BooleanField(default=False)
     route_review = models.BooleanField(default=False)
+    route = models.ForeignKey(Route, null=True, on_delete=models.CASCADE)
 
 
     class Meta:
@@ -24,8 +25,9 @@ class UserFeedback(models.Model):
 class ExhibitComment(models.Model):
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    user_id = models.ForeignKey(UserFeedback, on_delete=models.CASCADE)
-    exhibit_id = models.ForeignKey(Exhibit, on_delete=models.CASCADE)
+    user_feedback = models.ForeignKey(UserFeedback, on_delete=models.CASCADE)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
+    exhibit = models.ForeignKey(Exhibit, on_delete=models.CASCADE)
     rating_exhibit = models.IntegerField(
         null=True,
         blank=True,
@@ -39,8 +41,8 @@ class ExhibitComment(models.Model):
 class RouteReview(models.Model):
     text = models.TextField(null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-    user_id = models.ForeignKey(UserFeedback, on_delete=models.CASCADE)
-    route_id = models.ForeignKey(Route, on_delete=models.CASCADE)
+    user_feedback = models.ForeignKey(UserFeedback, on_delete=models.CASCADE)
+    route = models.ForeignKey(Route, on_delete=models.CASCADE)
     rating_route = models.IntegerField(
         null=True,
         blank=True,

@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from culture_bot.culture_bot import settings
+from culture_bot import settings
 
 
-async def spreadsheets_create(wrapper_services):
+async def spreadsheets_create(service, aiogoogle):
     now_date_time = datetime.now().strftime(settings.FORMAT)
-    service = await wrapper_services.discover('sheets', 'v4')
     spreadsheet_body = {
         'properties': {
             'title': f'Отчет на {now_date_time}',
@@ -23,32 +22,32 @@ async def spreadsheets_create(wrapper_services):
             }
         }]
     }
-    response = await wrapper_services.as_service_account(
+    response = await aiogoogle.as_service_account(
         service.spreadsheets.create(json=spreadsheet_body)
     )
     return response['spreadsheetId']
 
 
-async def set_user_permissions(wrapper_services, spreadsheetid, email):
+async def set_user_permissions(spreadsheet_id, aiogoogle):
     permissions_body = {
         'type': 'user',
         'role': 'writer',
-        'emailAddress': email
+        'emailAddress': settings.EMAIL
     }
-    service = await wrapper_services.discover('drive', 'v3')
-    await wrapper_services.as_service_account(
+    service = await aiogoogle.discover('drive', 'v3')
+    await aiogoogle.as_service_account(
         service.permissions.create(
-            fileId=spreadsheetid,
+            fileId=spreadsheet_id,
             json=permissions_body,
             fields="id"
         ))
 
 
 async def spreadsheets_update_value(
-    wrapper_services, some_data, spreadsheetid
+    all_data, spreadsheetid, aiogoogle
 ):
     now_date_time = datetime.now().strftime(settings.FORMAT)
-    service = await wrapper_services.discover('sheets', 'v4')
+    service = await aiogoogle.discover('sheets', 'v4')
     table_values = [
         ['Отчет от', now_date_time],
         ['Общая статистика'],
@@ -60,20 +59,20 @@ async def spreadsheets_update_value(
             'Количество отзывов маршрута',
         ]
     ]
-    for data in some_data:
+    for data in all_data:
         new_row = [
-            str(data.name),
-            str(data.persons),
-            str(data.datetime),
-            str(data.rating),
-            str(data.review)
+            'Нужно доделать',
+            'Нужно доделать',
+            'Нужно доделать',
+            'Нужно доделать',
+            'Нужно доделать'
         ]
         table_values.append(new_row)
     update_body = {
         'majorDimension': 'ROWS',
         'values': table_values
     }
-    return await wrapper_services.as_service_account(
+    return await aiogoogle.as_service_account(
         service.spreadsheets.values.update(
             spreadsheetId=spreadsheetid,
             range=settings.RANGE_UPDATE,
