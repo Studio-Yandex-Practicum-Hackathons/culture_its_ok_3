@@ -12,11 +12,13 @@ load_dotenv()
 
 dirname = os.path.dirname(__file__)
 
-MAX_PLACES = 3
+# Число мест на каждом из маршрутов (возможно добавлять)
+MAX_PLACES = (8, 3, 3)
 
 router = Router()
 
-way_counter = [0, 0]
+# Счётчик маршрутов и мест с привязкой к id пользователя Telegram
+way_counter = {}
 
 
 @router.message(Command('start'))
@@ -33,29 +35,34 @@ async def start_bot(message: Message):
         image_from_pc,
         caption="Карта фестиваля"
     )
-    way_counter[0] = 0
-    way_counter[1] = 0
+
+    way_counter[message.from_user.id] = [0, 0]
     return way_counter
 
 
-@router.message(F.text == 'Маршрут 1')
+@router.message(F.text == 'Маршрут 1. "Руки бы им оторвать"')
 @router.message(F.text == 'Маршрут 2')
 @router.message(F.text == 'Маршрут 3')
 async def choise_way(message: Message):
     pictures = {
-        'Маршрут 1': r'pictures\way_1_map.jpg',
+        'Маршрут 1. "Руки бы им оторвать"': r'pictures\way_1_map.jpg',
         'Маршрут 2': r'pictures\way_2_map.jpg',
         'Маршрут 3': r'pictures\way_3_map.jpg',
     }
     captions = {
-        'Маршрут 1': 'Карта маршрута 1',
+        'Маршрут 1. "Руки бы им оторвать"': 'Карта маршрута 1',
         'Маршрут 2': 'Карта маршрута 2',
         'Маршрут 3': 'Карта маршрута 3',
+    }
+    ways = {
+        'Маршрут 1. "Руки бы им оторвать"': 1,
+        'Маршрут 2': 2,
+        'Маршрут 3': 3,
     }
     image_from_pc = FSInputFile(
         os.path.join(dirname, pictures[message.text])
     )
-    way_counter[0] = int(message.text[-1])
+    way_counter[message.from_user.id][0] = int(ways[message.text])
     await message.answer(
         messages.START_WAY_TEXT
     )
@@ -73,16 +80,27 @@ async def choise_way(message: Message):
 @router.message(F.text == 'Да')
 @router.message(F.text == 'Идём дальше!')
 async def exhibit(message: Message):
-    if way_counter[1] < MAX_PLACES:
-        way_counter[1] = way_counter[1] + 1
+    if (
+        way_counter[message.from_user.id][1] <
+        MAX_PLACES[way_counter[message.from_user.id][0] - 1]
+    ):
+        way_counter[message.from_user.id][1] = (
+            way_counter[message.from_user.id][1] + 1
+        )
+        picture = str(
+            'pictures\\' + str(way_counter[message.from_user.id][0])
+            + '\\' + str(way_counter[message.from_user.id][1]) + '.jpg'
+        )
         image_from_pc = FSInputFile(
-            os.path.join(dirname, r'pictures\picture.jpg')
+            os.path.join(dirname, picture)
         )
         await message.answer(
             messages.START_MEDITATION
         )
         await message.answer(
-            messages.TEXT_PLACE_1
+            messages
+            .TEXT_PLACE_1[way_counter[message.from_user.id][0]][
+                way_counter[message.from_user.id][1] - 1]
         )
         await message.answer_photo(
             image_from_pc,
