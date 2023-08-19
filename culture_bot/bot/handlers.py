@@ -25,7 +25,7 @@ way_counter = {}
 @router.message(F.text == 'Меню')
 async def start_bot(message: Message):
     image_from_pc = FSInputFile(
-        os.path.join(dirname, r'pictures\map.jpg')
+        os.path.join(dirname, 'pictures', 'map.jpg')
     )
     await message.answer(
         messages.START_MESSAGE,
@@ -45,9 +45,9 @@ async def start_bot(message: Message):
 @router.message(F.text == 'Маршрут 3')
 async def choise_way(message: Message):
     pictures = {
-        'Маршрут 1. "Руки бы им оторвать"': r'pictures\way_1_map.jpg',
-        'Маршрут 2': r'pictures\way_2_map.jpg',
-        'Маршрут 3': r'pictures\way_3_map.jpg',
+        'Маршрут 1. "Руки бы им оторвать"': 'way_1_map.jpg',
+        'Маршрут 2': 'way_2_map.jpg',
+        'Маршрут 3': 'way_3_map.jpg',
     }
     captions = {
         'Маршрут 1. "Руки бы им оторвать"': 'Карта маршрута 1',
@@ -60,7 +60,7 @@ async def choise_way(message: Message):
         'Маршрут 3': 3,
     }
     image_from_pc = FSInputFile(
-        os.path.join(dirname, pictures[message.text])
+        os.path.join(dirname, 'pictures', pictures[message.text])
     )
     way_counter[message.from_user.id][0] = int(ways[message.text])
     await message.answer(
@@ -87,15 +87,27 @@ async def exhibit(message: Message):
         way_counter[message.from_user.id][1] = (
             way_counter[message.from_user.id][1] + 1
         )
-        picture = str(
-            'pictures\\' + str(way_counter[message.from_user.id][0])
-            + '\\' + str(way_counter[message.from_user.id][1]) + '.jpg'
-        )
+        picture = str(way_counter[message.from_user.id][1]) + '.jpg'
         image_from_pc = FSInputFile(
-            os.path.join(dirname, picture)
+            os.path.join(
+                dirname, 'pictures',
+                str(way_counter[message.from_user.id][0]), picture
+            )
         )
         await message.answer(
             messages.START_MEDITATION
+        )
+        await message.answer(
+            messages.NAME_OF_PLACE[way_counter[message.from_user.id][0]][
+                way_counter[message.from_user.id][1] - 1]
+        )
+        await message.answer(
+            messages.ADDRESSES[way_counter[message.from_user.id][0]][
+                way_counter[message.from_user.id][1] - 1]
+        )
+        await message.answer(
+            messages.HOW_TO_PASS[way_counter[message.from_user.id][0]][
+                way_counter[message.from_user.id][1] - 1]
         )
         await message.answer(
             messages
@@ -104,10 +116,6 @@ async def exhibit(message: Message):
         )
         await message.answer_photo(
             image_from_pc,
-            caption="Фото экспоната"
-        )
-        await message.answer(
-            messages.EXHIBIT_INFO_1
         )
         await message.answer(
             messages.QUESTION_ABOUT_EXHIBIT,
