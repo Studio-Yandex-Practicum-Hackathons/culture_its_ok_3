@@ -25,3 +25,17 @@ class ReviewOnRouteForm(forms.ModelForm):
     class Meta:
         model = ReviewOnRoute
         fields = ("author", "text", "route")
+
+#-------------
+from .models import Profile
+class ProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = (
+            'external_id',
+            'name',
+        )
+        widgets = {
+            'name': forms.TextInput,
+        }

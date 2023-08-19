@@ -52,6 +52,21 @@ class ReviewOnExhibitAdmin(admin.ModelAdmin):
     list_filter = ("author", "route")
     empty_value_display = "-пусто-"
 
+from .forms import ProfileForm
+from .models import Message
+from .models import Profile
+
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'external_id', 'name')
+    form = ProfileForm
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'profile', 'text', 'created_at')
+
 
 admin.site.register(Route, RouteAdmin)
 admin.site.register(Exhibit, ExhibitAdmin)

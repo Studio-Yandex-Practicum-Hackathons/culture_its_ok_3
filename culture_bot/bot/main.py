@@ -1,33 +1,30 @@
-import asyncio
-import logging
-import os
+from aiogram import Bot, Dispatcher,  types
 
-from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv
+# Получение токена бота
+TOKEN = '5575568139:AAEuNC2x_yW23LFcefoBmmsc7AZw31abqyA'
 
-from handlers import router
+# Инициализация бота
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 
-load_dotenv()
+# Обработчик входящих сообщений
+@dp.message_handler()
+async def handle_message(message: types.Message):
+    # Обработка ссылки
+    if message.entities and message.entities[0].type == 'url':
+        url = message.text
+        await handle_url(url)
 
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+    # Отправка ответа на сообщение
+    await message.answer('Спасибо за сообщение!')
 
+# Обработка ссылки
+async def handle_url(url: str):
+    pass
+    # Реализация перехода по ссылке
+    # В этой функции можно выполнить любые действия с полученной ссылкой
+    # Например, получить данные с внешнего ресурса и отправить пользователю информацию
 
-async def main():
-    bot = Bot(token=TELEGRAM_TOKEN)
-    dp = Dispatcher()
-    dp.include_router(router)
-
-    try:
-        await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot)
-    finally:
-        await bot.session.close()
-
-
+# Запуск бота
 if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s, %(levelname)s, %(message)s',
-    )
-    asyncio.run(main())
+    dp.start_polling(dp)
