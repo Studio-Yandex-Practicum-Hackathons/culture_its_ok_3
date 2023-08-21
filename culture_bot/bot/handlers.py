@@ -1,5 +1,11 @@
 import os
-
+import sys
+# script_dir = os.path.dirname(__file__)
+# mymodule_dir = os.path.join(script_dir, '..', 'excursion')
+# sys.path.append(mymodule_dir)
+# print(mymodule_dir)
+# excursion.models.Profile # Route, Exhibit, ReviewOnExhibit, ReviewOnRoute, Journey
+# from .excursion.models import Exhibit
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
@@ -38,10 +44,12 @@ async def start_bot(message: Message):
     return way_counter
 
 
-@router.message(F.text == 'Маршрут 1')
-@router.message(F.text == 'Маршрут 2')
-@router.message(F.text == 'Маршрут 3')
+# @router.message(F.text == 'Маршрут 1')
+# @router.message(F.text == 'Маршрут 2')
+# @router.message(F.text == 'Маршрут 3')
+@router.message(Command('map'))
 async def choise_way(message: Message):
+    print(message.text)
     pictures = {
         'Маршрут 1': r'pictures\way_1_map.jpg',
         'Маршрут 2': r'pictures\way_2_map.jpg',
@@ -72,6 +80,7 @@ async def choise_way(message: Message):
 
 @router.message(F.text == 'Да')
 @router.message(F.text == 'Идём дальше!')
+@router.message(Command('next'))
 async def exhibit(message: Message):
     if way_counter[1] < MAX_PLACES:
         way_counter[1] = way_counter[1] + 1

@@ -40,12 +40,6 @@ def do_echo(update: Update, context: CallbackContext):
 
     r, _ = Route.objects.get_or_create(title=text)
 
-    # m = Message(
-    #     profile=p,
-    #     text=text,
-    # )
-    # m.save()
-
     reply_text = f'Ваш ID = {chat_id}\n{r.description}'
     update.message.reply_text(
         text=reply_text,
@@ -74,20 +68,28 @@ def do_next(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
 
     tr = Journey.objects.get(traveler=chat_id)
-    ex = Exhibit.objects.get(route__title='1', order=tr.now_exhibit+1)
-    tr.now_exhibit = tr.now_exhibit + 1
-    tr.save()
-    update.message.reply_text(
-        text=ex.description,
-    )
+    if tr.now_exhibit < Route.objects.get(title=tr.route.title).exhibit.count():
+        ex = Exhibit.objects.get(route__title=tr.route, order=tr.now_exhibit + 1)
+        tr.now_exhibit = tr.now_exhibit + 1
+        tr.save()
+        update.message.reply_text(
+            text=ex.description,
+        )
+    else:
+        tr.delete()
+        update.message.reply_text(
+            text='это было прекрасно',
+        )
 
 @log_errors
 def do_map(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-
+    number_map = str(update.message.text).split()[1]
+    Journey.objects.filter(traveler=chat_id).delete()
+    print(Route.objects.get(title=number_map).exhibit.count())
     tr = Journey(
         traveler=chat_id,
-        route=Route.objects.get(title='1'),
+        route=Route.objects.get(title=number_map),
         now_exhibit=0
     )
     tr.save()
@@ -125,7 +127,7 @@ class Command(BaseCommand):
         updater.dispatcher.add_handler(message_handler)
         updater.dispatcher.add_handler(CommandHandler('count', do_count))
         updater.dispatcher.add_handler(CommandHandler('next', do_next))
-        updater.dispatcher.add_handler(CommandHandler('map_1', do_map))
+        updater.dispatcher.add_handler(CommandHandler('map', do_map))
 
         # 3 -- запустить бесконечную обработку входящих сообщений
         updater.start_polling()

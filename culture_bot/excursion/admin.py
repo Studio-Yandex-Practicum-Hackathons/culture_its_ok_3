@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Route, Exhibit, ReviewOnExhibit, ReviewOnRoute
+from .models import Route, Exhibit, ReviewOnExhibit, ReviewOnRoute, Journey
 
 
 class RouteAdmin(admin.ModelAdmin):
@@ -66,6 +66,10 @@ class ProfileAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'profile', 'text', 'created_at')
+
+@admin.register(Journey)
+class JourneyAdmin(admin.ModelAdmin):
+    list_display = ('traveler', 'route', 'now_exhibit',)
 
 
 admin.site.register(Route, RouteAdmin)
