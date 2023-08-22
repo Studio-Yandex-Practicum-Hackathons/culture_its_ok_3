@@ -34,10 +34,27 @@ async def spreadsheets_update_value(
     sheet_names = {
         'for_general_report': 'Общая статистика за все время',
         'for_days_report': 'Статистика по дням',
-        'for_routes_report': [data['for_routes_report'].keys()]
+        'for_routes_report': [data['for_routes_report'].keys()],
+        'for_exhibits_report': [data['for_exhibits_report'].keys()]
     }
     for name in sheet_names.keys():
-        if name in data.keys() and name != 'for_routes_report':
+        if name in data.keys() and name == 'for_general_report':
+            table_values = await create_table_values(data, name)
+            update_body = {
+                'majorDimension': 'ROWS',
+                'values': table_values
+            }
+            
+            range_name = f"{sheet_names[name]}!A1"
+            await aiogoogle.as_service_account(
+                service.spreadsheets.values.update(
+                    spreadsheetId=spreadsheetid,
+                    range=range_name,
+                    valueInputOption='USER_ENTERED',
+                    json=update_body
+                )
+            )
+        if name in data.keys() and name == 'for_days_report':
             table_values = await create_table_values(data, name)
             update_body = {
                 'majorDimension': 'ROWS',
@@ -56,13 +73,31 @@ async def spreadsheets_update_value(
         if name in data.keys() and name == 'for_routes_report':
             for name_route, _ in data['for_routes_report'].items():
                 table_values = await create_table_values(
-                    data, name, name_route=name_route
+                    data, name, name_obj=name_route
                 )
                 update_body = {
                     'majorDimension': 'ROWS',
                     'values': table_values
                 }
                 range_name = f"{name_route}!A1"
+                await aiogoogle.as_service_account(
+                    service.spreadsheets.values.update(
+                        spreadsheetId=spreadsheetid,
+                        range=range_name,
+                        valueInputOption='USER_ENTERED',
+                        json=update_body
+                    )
+                )
+        if name in data.keys() and name == 'for_exhibits_report':
+            for name_exhibit, _ in data['for_exhibits_report'].items():
+                table_values = await create_table_values(
+                    data, name, name_obj=name_exhibit
+                )
+                update_body = {
+                    'majorDimension': 'ROWS',
+                    'values': table_values
+                }
+                range_name = f"{name_exhibit}!A1"
                 await aiogoogle.as_service_account(
                     service.spreadsheets.values.update(
                         spreadsheetId=spreadsheetid,

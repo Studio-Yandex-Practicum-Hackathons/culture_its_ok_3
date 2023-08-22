@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from google_api.views import (
     CreateGoogleGeneralReportViewSet, ExhibitCommentViewSet, ExhibitViewSet,
-    RouteReviewViewSet, RouteViewSet, UserFeedbackViewSet
+    GraphViewSet, RouteReviewViewSet, RouteViewSet, UserFeedbackViewSet
 )
 
 router = DefaultRouter()
@@ -17,6 +17,7 @@ router.register(
     CreateGoogleGeneralReportViewSet,
     base_name='create-google-report'
 )
+router.register(r'create-graph', GraphViewSet, basename='graph')
 
 urlpatterns = [
     path('', include(router.urls)),

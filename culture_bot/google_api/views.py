@@ -1,9 +1,14 @@
 import asyncio
+import os
+import shutil
+import tempfile
 
-from django.db.models import Avg
+from django.http import HttpResponse
+import plotly.io as pio
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+from culture_bot import settings
 from excursion.models import Exhibit, Route
 from .google_client import create_general_report
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
@@ -11,59 +16,39 @@ from google_api.serializers import (
     ExhibitCommentSerializer, ExhibitSerializer, RouteReviewSerializer,
     RouteSerializer, UserFeedbackSerializer
 )
+from .utils import create_graph, get_data_from_db
 
 # for statistics and google sheets
 
 class CreateGoogleGeneralReportViewSet(viewsets.ViewSet):
 
     def list(self, request):
-        data = {}
-        data['for_general_report'] = {}
-        data['for_days_report'] = {}
-        data['for_routes_report'] = {}
-        for route in Route.objects.all():
-            data['for_general_report'][route.title] = {
-                "Number_of_visitors": UserFeedback.objects.filter(
-                    route=route.id).count(),
-                "Average_rating": RouteReview.objects.filter(
-                    route=route.id).aggregate(
-                        Avg('rating_route'))['rating_route__avg'],
-                "Number_of_route_reviews": RouteReview.objects.filter(
-                    route=route.id).exclude(text='').count(),
-                "Number_of_comments": ExhibitComment.objects.filter(
-                    route=route.id).exclude(text='').count()
-            }
-        for feedback in UserFeedback.objects.all():
-            date = feedback.start_time_route.date().strftime('%Y-%m-%d')
-            if date not in data['for_days_report']:
-                data['for_days_report'][date] = {
-                    "visitors": 0,
-                    "reviews": 0,
-                    "comments": 0
-                }
-            data['for_days_report'][date]['visitors'] += 1
-            data['for_days_report'][date]['reviews'] = RouteReview.objects.filter(
-                timestamp__date=date).exclude(text='').count()
-            data['for_days_report'][date]['comments'] = ExhibitComment.objects.filter(
-                timestamp__date=date).exclude(text='').count()
-        for route in Route.objects.all():
-            route_reviews = RouteReview.objects.filter(route=route.id)
-            route_review_data = []
-            for review in route_reviews:
-                user_feedback = UserFeedback.objects.get(id=review.user_feedback_id)
-                route_review_data.append({
-                    "Telegram_ID": user_feedback.telegram_id,
-                    "Rating": review.rating_route,
-                    "Review": review.text,
-                    "Data": review.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-                })
-            data['for_routes_report'][route.title] = route_review_data
+        data = get_data_from_db(for_general_report=True,
+        for_days_report=True,
+        for_routes_report=True,
+        for_exhibits_report=True
+        )
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         results = loop.run_until_complete(create_general_report(data))
         return Response({"result": results}, status=status.HTTP_200_OK)
 
-# for test views create
+
+class GraphViewSet(viewsets.ViewSet):
+    def list(self, request):
+        data = get_data_from_db(for_days_report=True, for_routes_report=True)
+        fig = create_graph(data)
+        temp_dir = tempfile.gettempdir()
+        temp_html_file = os.path.join(temp_dir, 'graph.html')
+        pio.write_html(fig, temp_html_file, auto_open=False)
+        destination_path = os.path.join(
+            settings.STATICFILES_DIRS[0], 'graph.html'
+        )
+        shutil.move(temp_html_file, destination_path)
+        with open(destination_path, 'r') as f:
+            graph_html_content = f.read()
+        return HttpResponse(graph_html_content, content_type='text/html')
+
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
@@ -88,4 +73,3 @@ class ExhibitCommentViewSet(viewsets.ModelViewSet):
 class RouteReviewViewSet(viewsets.ModelViewSet):
     queryset = RouteReview.objects.all()
     serializer_class = RouteReviewSerializer
-
