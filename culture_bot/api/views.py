@@ -88,7 +88,7 @@ class GraphViewSet(viewsets.ViewSet):
         temp_html_file = os.path.join(temp_dir, 'graph.html')
         pio.write_html(fig, temp_html_file, auto_open=False)
         destination_path = os.path.join(
-            settings.STATICFILES_DIRS[0], 'graph.html'
+            settings.STATIC_ROOT, 'graph.html'
         )
         shutil.move(temp_html_file, destination_path)
         with open(destination_path, 'r') as f:
