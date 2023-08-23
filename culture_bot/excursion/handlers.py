@@ -180,10 +180,7 @@ async def do_next(message: Message):
         await message.answer(
             text=ex.description,
         )
-        path = os.path.join(dirname, str(ex.image)[10:])
-        print(1111)
-        print(path)
-        print(2222)
+        path = os.path.join(dirname, str(ex.image).replace('excursion/'))
         image_from_pc = FSInputFile(path)
         print(image_from_pc)
         await message.answer_photo(
@@ -217,9 +214,23 @@ async def do_map(message: Message):
         text='Ну что погнали !',
     )
 
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
 
 @router.message()
 async def what_i_can_do(message: Message):
+    chat_id = message.from_user.id
+
+    try:
+        f = Journey.objects.get(traveler=chat_id)  # MultipleObjectsReturned
+        print(f)
+    except ObjectDoesNotExist:
+        print("Объект не сушествует")
+        return None
+    except MultipleObjectsReturned:
+        print("Найдено более одного объекта")
+        return None
+
     await message.answer(
         text='эхооооо'
     )
