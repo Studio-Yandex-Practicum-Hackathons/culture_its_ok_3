@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from .custom_keyboard import *
 from .messages import *
-from .models import Message, Profile, Route, Exhibit, ReviewOnExhibit, ReviewOnRoute, Journey
+from .models import Profile, Route, Exhibit, ReviewOnExhibit, ReviewOnRoute, Journey
 
 load_dotenv()
 
@@ -216,6 +216,31 @@ async def do_map(message: Message):
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+@router.message(Command('v'))
+async def do_next(message: Message):
+    chat_id = message.from_user.id
+
+    path = os.path.join(dirname, 'pictures/IMG_6528.mp4')
+    print(path)
+    image_from_pc = FSInputFile(path)
+    print(image_from_pc)
+    await message.answer_video(
+        image_from_pc,
+        caption="фотка экспоната"
+    )
+
+@router.message(Command('a'))
+async def do_next(message: Message):
+    chat_id = message.from_user.id
+
+    path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
+    print(path)
+    image_from_pc = FSInputFile(path)
+    print(image_from_pc)
+    await message.answer_audio(
+        image_from_pc,
+        caption="фотка экспоната"
+    )
 
 @router.message()
 async def what_i_can_do(message: Message):
@@ -234,3 +259,5 @@ async def what_i_can_do(message: Message):
     await message.answer(
         text='эхооооо'
     )
+
+
