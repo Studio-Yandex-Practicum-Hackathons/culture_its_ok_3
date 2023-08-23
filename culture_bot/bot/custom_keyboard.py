@@ -2,13 +2,20 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 keyboard_ways = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Маршрут 1. "Руки бы им оторвать"'), ],
-        [KeyboardButton(text='Маршрут 2'), ],
-        [KeyboardButton(text='Маршрут 3'), ],
+        [KeyboardButton(
+            text='Маршрут 1. "Руки бы им оторвать"'
+        ), ],
+        [KeyboardButton(
+            text='Маршрут 2. "Не с кем играть. Играю со стенкой"'
+        ), ],
+        [KeyboardButton(
+            text='Маршрут 3. "… но спи/СМИ спокойно"'
+        ), ],
         [KeyboardButton(text='О проекте'), ],
         [KeyboardButton(text='Что ты умеешь?'), ]
     ],
     resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 keyboard_yes_no = ReplyKeyboardMarkup(
@@ -17,6 +24,7 @@ keyboard_yes_no = ReplyKeyboardMarkup(
         [KeyboardButton(text='Нет'), ],
     ],
     resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 keyboard_go_on_or_stop = ReplyKeyboardMarkup(
@@ -25,6 +33,7 @@ keyboard_go_on_or_stop = ReplyKeyboardMarkup(
         [KeyboardButton(text='Завершить маршрут'), ],
     ],
     resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 keyboard_yes_or_stop = ReplyKeyboardMarkup(
@@ -33,6 +42,7 @@ keyboard_yes_or_stop = ReplyKeyboardMarkup(
         [KeyboardButton(text='Завершить маршрут'), ],
     ],
     resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 keyboard_menu = ReplyKeyboardMarkup(
@@ -40,4 +50,5 @@ keyboard_menu = ReplyKeyboardMarkup(
         [KeyboardButton(text='Меню'), ],
     ],
     resize_keyboard=True,
+    one_time_keyboard=True
 )
