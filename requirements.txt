@@ -10,3 +10,4 @@ aiogoogle==5.4.0
 djangorestframework==3.10.3
 plotly==5.16.1
 pandas==2.0.3
+aiohttp==3.8.5

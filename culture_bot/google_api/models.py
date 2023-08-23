@@ -5,13 +5,10 @@ from excursion.models import Exhibit, Route
 
 
 class UserFeedback(models.Model):
-    telegram_id = models.CharField(
-        'user id telegram', max_length=150, blank=True
+    telegram_id = models.CharField(max_length=150, blank=True
     )
-    start_time_route = models.DateTimeField()
+    start_time_route = models.DateTimeField(auto_now_add=True)
     end_time_route = models.DateTimeField(null=True, blank=True)
-    exhibit_comment = models.BooleanField(default=False)
-    route_review = models.BooleanField(default=False)
     route = models.ForeignKey(Route, null=True, on_delete=models.CASCADE)
 
 

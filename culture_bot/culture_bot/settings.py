@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'excursion.apps.ExcursionConfig',
-    'google_api.apps.GoogleApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'google_api.apps.GoogleApiConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
