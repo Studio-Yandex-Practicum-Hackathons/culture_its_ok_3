@@ -5,8 +5,9 @@ import os
 from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
-from handlers import router
-
+from excursion.handlers import router
+from django.core.management.base import BaseCommand
+from excursion.models import *
 load_dotenv()
 
 # TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -27,9 +28,12 @@ async def main():
         await bot.session.close()
 
 
-if __name__ == '__main__':
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s, %(levelname)s, %(message)s',
-    )
-    asyncio.run(main())
+class Command(BaseCommand):
+    help = 'Телеграм-бот'
+
+    def handle(self, *args, **options):
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s, %(levelname)s, %(message)s',
+        )
+        asyncio.run(main())
