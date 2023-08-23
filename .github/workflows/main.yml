@@ -2,9 +2,9 @@ name: workflow
 
 on:
   push:
-    branches: [ main, master, develop, actions ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master, develop, actions ]
+    branches: [ main, master, develop ]
 
 jobs:
   tests:
