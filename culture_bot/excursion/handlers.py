@@ -28,7 +28,7 @@ async def start_bot(message: Message):
     )
     await message.answer(
         START_MESSAGE,
-        reply_markup=keyboard_ways
+        reply_markup=get_keyboard()
     )
     await message.answer_photo(
         image_from_pc,
@@ -241,6 +241,20 @@ async def do_next(message: Message):
         image_from_pc,
         caption="фотка экспоната"
     )
+
+@router.message(Command('list'))
+async def do_next(message: Message):
+    chat_id = message.from_user.id
+    list_rout = Route.objects.all()
+
+    path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
+    print(path)
+    image_from_pc = FSInputFile(path)
+    print(image_from_pc)
+    for r in list_rout:
+        await message.answer(
+            text=r.title
+        )
 
 @router.message()
 async def what_i_can_do(message: Message):

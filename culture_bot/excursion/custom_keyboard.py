@@ -1,15 +1,28 @@
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+from .models import Route
 
-keyboard_ways = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='Маршрут 1'), ],
-        [KeyboardButton(text='Маршрут 2'), ],
-        [KeyboardButton(text='Маршрут 3'), ],
-        [KeyboardButton(text='О проекте'), ],
-        [KeyboardButton(text='Что ты умеешь?'), ]
-    ],
-    resize_keyboard=True,
-)
+routs = Route.objects.all()
+
+button_ways = [
+    *[[InlineKeyboardButton(text=rout.title)] for rout in routs],
+    [InlineKeyboardButton(text='О проекте')],
+    [InlineKeyboardButton(text='Что ты умеешь?')],
+]
+
+keyboard_ways = InlineKeyboardMarkup(inline_keyboard=button_ways)
+# keyboard_ways.add(*button_ways)
+def get_keyboard():
+    # Генерация клавиатуры.
+    buttons = [
+        InlineKeyboardButton(text="-1", callback_data="num_decr"),
+        InlineKeyboardButton(text="+1", callback_data="num_incr"),
+        InlineKeyboardButton(text="Подтвердить", callback_data="num_finish")
+    ]
+    # Благодаря row_width=2, в первом ряду будет две кнопки, а оставшаяся одна
+    # уйдёт на следующую строку
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    return keyboard
 
 keyboard_yes_no = ReplyKeyboardMarkup(
     keyboard=[
