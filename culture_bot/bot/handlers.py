@@ -27,6 +27,7 @@ way_counter = {}
 
 class Cult_cuestions(StatesGroup):
     question_1 = State()
+    raiting = State()
 
 
 @router.message(Command('start'))
@@ -183,79 +184,7 @@ async def exhibit(message: Message, state: FSMContext):
             await state.set_state(Cult_cuestions.question_1)
         # вариант, когда нет подводки
         else:
-            picture = str(way_counter[message.from_user.id][1]) + '.jpg'
-            image_from_pc = FSInputFile(
-                os.path.join(
-                    dirname, 'pictures',
-                    str(way_counter[message.from_user.id][0]), picture
-                )
-            )
-            await message.answer(
-                messages
-                .TEXT_PLACE[way_counter[message.from_user.id][0]][
-                    way_counter[message.from_user.id][1] - 1]
-            )
-            await message.answer_photo(
-                image_from_pc,
-            )
-            if (
-                way_counter[message.from_user.id][0] == 1 and
-                way_counter[message.from_user.id][1] == 1
-            ):
-                await message.answer_photo(
-                    FSInputFile(
-                        os.path.join(dirname, 'pictures', '1', '1_1.jpg')
-                    ),
-                )
-                await message.answer_photo(
-                    FSInputFile(
-                        os.path.join(dirname, 'pictures', '1', '1_2.jpg')
-                    ),
-                )
-                await message.answer_photo(
-                    FSInputFile(
-                        os.path.join(dirname, 'pictures', '1', '1_3.jpg')
-                    ),
-                )
-            if (
-                way_counter[message.from_user.id][0] == 3 and
-                way_counter[message.from_user.id][1] == 2
-            ):
-                await message.answer_photo(
-                    FSInputFile(
-                        os.path.join(dirname, 'pictures', '3', '2_1.jpg')
-                    ),
-                )
-            if (
-                way_counter[message.from_user.id][0] == 3 and
-                way_counter[message.from_user.id][1] == 10
-            ):
-                await message.answer_photo(
-                    FSInputFile(
-                        os.path.join(dirname, 'pictures', '3', '10_1.jpg')
-                    ),
-                )
-            # вопрос для рефлексии
-            if messages.AFTER_QUESTION[way_counter[message.from_user.id][0]][
-                    way_counter[message.from_user.id][1] - 1] != '':
-                await message.answer(
-                    messages.AFTER_QUESTION[
-                        way_counter[message.from_user.id][0]][
-                        way_counter[message.from_user.id][1] - 1],
-                )
-            # ответ на рефлексию
-            if messages.AFTER_ANSWER[way_counter[message.from_user.id][0]][
-                    way_counter[message.from_user.id][1] - 1] != '':
-                await message.answer(
-                    messages.AFTER_ANSWER[way_counter[
-                        message.from_user.id][0]][
-                        way_counter[message.from_user.id][1] - 1]
-                )
-            await message.answer(
-                messages.GREAT,
-                reply_markup=custom_keyboard.keyboard_go_on_or_stop
-            )
-            return way_counter
+            await after_get_answer_1(message, state)
     else:
         await message.answer(
             messages.END_OF_WAY
@@ -267,7 +196,7 @@ async def exhibit(message: Message, state: FSMContext):
 
 
 @router.message(Cult_cuestions.question_1)
-async def after_get_answer_1(message: Message):
+async def after_get_answer_1(message: Message, state: FSMContext):
     picture = str(way_counter[message.from_user.id][1]) + '.jpg'
     image_from_pc = FSInputFile(
             os.path.join(
@@ -275,11 +204,6 @@ async def after_get_answer_1(message: Message):
                 str(way_counter[message.from_user.id][0]), picture
             )
         )
-    await message.answer(
-        messages
-        .TEXT_PLACE[way_counter[message.from_user.id][0]][
-            way_counter[message.from_user.id][1] - 1]
-    )
     await message.answer_photo(
         image_from_pc,
     )
@@ -320,6 +244,11 @@ async def after_get_answer_1(message: Message):
                 os.path.join(dirname, 'pictures', '3', '10_1.jpg')
             ),
         )
+    await message.answer(
+        messages
+        .TEXT_PLACE[way_counter[message.from_user.id][0]][
+            way_counter[message.from_user.id][1] - 1]
+    )
     # вопрос для рефлексии
     if messages.AFTER_QUESTION[way_counter[message.from_user.id][0]][
             way_counter[message.from_user.id][1] - 1] != '':
@@ -334,8 +263,23 @@ async def after_get_answer_1(message: Message):
             messages.AFTER_ANSWER[way_counter[message.from_user.id][0]][
                 way_counter[message.from_user.id][1] - 1]
         )
+    # Оценка работы
     await message.answer(
-        messages.GREAT,
+        messages.RAITING_MESSAGE,
+        reply_markup=custom_keyboard.keyboard_rating
+    )
+    # Ждём ввода текста
+    await state.set_state(Cult_cuestions.raiting)
+    # await message.answer(
+    #     messages.GREAT,
+    #     reply_markup=custom_keyboard.keyboard_go_on_or_stop
+    # )
+    return way_counter
+
+
+@router.message(Cult_cuestions.raiting)
+async def after_get_raiting(message: Message):
+    await message.answer(
+        messages.RAITING_THANKS,
         reply_markup=custom_keyboard.keyboard_go_on_or_stop
     )
-    return way_counter
