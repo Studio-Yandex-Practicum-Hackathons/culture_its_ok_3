@@ -6,6 +6,8 @@ from aiogram import Bot, Dispatcher
 from dotenv import load_dotenv
 
 from handlers import router
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.strategy import FSMStrategy
 
 load_dotenv()
 
@@ -15,7 +17,9 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 async def main():
     bot = Bot(token=TELEGRAM_TOKEN)
-    dp = Dispatcher()
+    dp = Dispatcher(
+        storage=MemoryStorage(), fsm_strategy=FSMStrategy.USER_IN_CHAT
+    )
     dp.include_router(router)
 
     try:

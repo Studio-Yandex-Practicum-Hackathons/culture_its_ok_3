@@ -13,8 +13,7 @@ from api.serializers import (
     ExhibitCommentSerializer, ExhibitSerializer, RouteReviewSerializer,
     RouteSerializer, UserFeedbackSerializer
 )
-from api.utils import create_graph, get_data_from_db
-from culture_bot import settings
+from api.utils import get_data_from_db
 from excursion.models import Exhibit, Route
 from google_api.google_client import create_general_report
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
@@ -69,7 +68,8 @@ class ExhibitCommentViewSet(viewsets.ModelViewSet):
 class CreateGoogleGeneralReportViewSet(viewsets.ViewSet):
 
     def list(self, request):
-        data = get_data_from_db(for_general_report=True,
+        data = get_data_from_db(
+        for_general_report=True,
         for_days_report=True,
         for_routes_report=True,
         for_exhibits_report=True
@@ -78,22 +78,6 @@ class CreateGoogleGeneralReportViewSet(viewsets.ViewSet):
         asyncio.set_event_loop(loop)
         results = loop.run_until_complete(create_general_report(data))
         return Response({"result": results}, status=status.HTTP_200_OK)
-
-
-class GraphViewSet(viewsets.ViewSet):
-    def list(self, request):
-        data = get_data_from_db(for_days_report=True, for_routes_report=True)
-        fig = create_graph(data)
-        temp_dir = tempfile.gettempdir()
-        temp_html_file = os.path.join(temp_dir, 'graph.html')
-        pio.write_html(fig, temp_html_file, auto_open=False)
-        destination_path = os.path.join(
-            settings.STATIC_ROOT, 'graph.html'
-        )
-        shutil.move(temp_html_file, destination_path)
-        with open(destination_path, 'r') as f:
-            graph_html_content = f.read()
-        return HttpResponse(graph_html_content, content_type='text/html')
 
 
 class RouteViewSet(viewsets.ModelViewSet):

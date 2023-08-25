@@ -16,27 +16,43 @@ async def create_userfeedback(telegram_id, route_id):
             else:
                 print("Ошибка создания пользователя")
 
-
+                
 async def create_exhibit_comment_and_raiting(
     text, telegram_id, route_id, exhibit_name, rating_exhibit
     ):
+    url = f"http://127.0.0.1:8000/api/user-feedback/get_by_telegram_id_and_route/"
+    params = {
+        'telegram_id': telegram_id,
+        'route': route_id
+    }
     async with aiohttp.ClientSession() as session:
-        data = {
-            'text': text,
-            'telegram_id': telegram_id,
-            'route': route_id,
-            'exhibit': exhibit_name,
-            'rating_exhibit': rating_exhibit
-        }
-        async with session.post(
-            'http://127.0.0.1:8000/api/exhibit-comment/', data=data
-        ) as response:
-            if response.status == 201:
-                await print("Запись рефлексии создана!")
+        async with session.get(url, params=params) as response:
+            if response.status == 200:
+                feedback_data = await response.json()
+                user_feedback_id = feedback_data.get('id')
+                if user_feedback_id is not None:
+                    url_comment = 'http://127.0.0.1:8000/api/exhibit-comment/'
+                    params_comment = {
+                        'text': text,
+                        'user_feedback': user_feedback_id,
+                        'route': route_id,
+                        'exhibit': exhibit_name,
+                        'rating_exhibit': rating_exhibit
+                    }
+                    async with session.post(
+                        url_comment, json=params_comment
+                    ) as update_response:
+                        if update_response.status == 201:
+                            print("Запись о рефлексии создана")
+                        else:
+                            print("Ошибка создания рефлексии")
+                else:
+                    print("Запись о пользователе не найдена")
             else:
-                await print("Ошибка создания записи рефлексии!")
+                print("Ошибка получения данных о пользователе")
 
 
+# нужно доделать
 async def create_route_review_and_raiting(
     text, telegram_id, route_id, rating_route
     ):

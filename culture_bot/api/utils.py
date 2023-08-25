@@ -1,44 +1,8 @@
 from django.db.models import Avg
-import pandas as pd
-import plotly.express as px
 
 from excursion.models import Exhibit, Route
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
 
-
-def create_graph(data):
-    rows = []
-    for date, day_data in data['for_days_report'].items():
-        visitors = day_data.get('visitors', 0)
-        avg_ratings = {
-            'Date': date, 'Общее количество пользователей': visitors
-        }
-        for route, route_data in data['for_routes_report'].items():
-            total_rating = 0
-            num_ratings = 0
-            for rating_data in route_data:
-                rating_date = rating_data['Data'][:10]
-                if rating_date == date:
-                    total_rating += rating_data['Rating']
-                    num_ratings += 1
-            if num_ratings > 0:
-                avg_rating = total_rating / num_ratings
-                avg_ratings[f'Средний рейтинг {route}'] = round(
-                    avg_rating, 2
-                )
-            else:
-                avg_ratings[f'Средний рейтинг {route}'] = None
-        rows.append(avg_ratings)
-    df = pd.DataFrame(rows)
-    fig = px.line(df, x='Date', y=df.columns[1:], title='График по дням')
-    fig.update_layout(
-        xaxis_title='Date',
-        yaxis_title='Количество поситителей и среднее значение рейтинга'
-    )
-    fig.update_layout(
-        legend_title_text='Пользователи и рейтинг маршрутов'
-    )
-    return fig
 
 def get_data_from_db(
     for_general_report=False,
