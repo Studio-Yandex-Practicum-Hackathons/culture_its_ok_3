@@ -132,3 +132,8 @@ dmypy.json
 .idea
 
 pictures/
+/culture_bot/excursion/exhibit/
+*.jpg
+*.png
+*.jpeg
+/culture_bot/excursion/router_map/
