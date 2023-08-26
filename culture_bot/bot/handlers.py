@@ -2,15 +2,13 @@ import os
 
 from aiogram import F, Router
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile, Message
 from dotenv import load_dotenv
 
 import custom_keyboard
 import messages
-
-from aiogram.fsm.state import StatesGroup, State
-from aiogram.fsm.context import FSMContext
-
 
 load_dotenv()
 
@@ -247,7 +245,8 @@ async def after_get_answer_1(message: Message, state: FSMContext):
     await message.answer(
         messages
         .TEXT_PLACE[way_counter[message.from_user.id][0]][
-            way_counter[message.from_user.id][1] - 1]
+            way_counter[message.from_user.id][1] - 1],
+        parse_mode="HTML"
     )
     # вопрос для рефлексии
     if messages.AFTER_QUESTION[way_counter[message.from_user.id][0]][
