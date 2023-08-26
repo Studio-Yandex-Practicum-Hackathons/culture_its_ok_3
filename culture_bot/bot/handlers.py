@@ -1,16 +1,13 @@
 import os
 
-from aiogram import F, Router
-from aiogram.filters import Command
-from aiogram.types import FSInputFile, Message
-from dotenv import load_dotenv
-
 import custom_keyboard
 import messages
-
-from aiogram.fsm.state import StatesGroup, State
+from aiogram import F, Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import FSInputFile, Message
+from dotenv import load_dotenv
 
 load_dotenv()
 

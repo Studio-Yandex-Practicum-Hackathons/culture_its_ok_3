@@ -60,8 +60,16 @@ class Exhibit(models.Model):
         max_length=50,
         verbose_name="Художник",
     )
-    order = models.PositiveIntegerField()
 
+    question_for_reflection = models.TextField(
+        verbose_name="Вопрос для рефлексии",
+    )
+
+    answer_for_reflection = models.TextField(
+        verbose_name="Ответ для рефлексии",
+    )
+
+    order = models.PositiveIntegerField()
 
     class Meta:
         verbose_name = "Экспонат"

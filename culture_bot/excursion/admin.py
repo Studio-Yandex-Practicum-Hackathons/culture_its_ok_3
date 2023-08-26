@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Route, Exhibit, ReviewOnExhibit, ReviewOnRoute, Journey
+from .models import Exhibit, Journey, ReviewOnExhibit, ReviewOnRoute, Route
 
 
 class RouteAdmin(admin.ModelAdmin):
@@ -53,8 +53,7 @@ class ReviewOnExhibitAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 from .forms import ProfileForm
-from .models import Message
-from .models import Profile
+from .models import Message, Profile
 
 
 @admin.register(Profile)
