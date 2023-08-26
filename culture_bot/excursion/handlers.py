@@ -28,7 +28,7 @@ async def start_bot(message: Message):
     )
     await message.answer(
         START_MESSAGE,
-        reply_markup=get_keyboard()
+        reply_markup=keyboard_ways
     )
     await message.answer_photo(
         image_from_pc,
@@ -180,12 +180,13 @@ async def do_next(message: Message):
         await message.answer(
             text=ex.description,
         )
-        path = os.path.join(dirname, str(ex.image).replace('excursion/'))
+        path = os.path.join(dirname, str(ex.image).replace('excursion/', ''))
         image_from_pc = FSInputFile(path)
         print(image_from_pc)
+        print(path)
         await message.answer_photo(
             image_from_pc,
-            caption="фотка экспоната"
+            caption=ex.name
         )
 
     else:
@@ -200,7 +201,7 @@ async def do_next(message: Message):
 async def do_map(message: Message):
     chat_id = message.from_user.id
     print(chat_id)
-    number_map = str(message.text).split()[1]
+    number_map = str(message.text).replace('/map ', '')
     Journey.objects.filter(traveler=chat_id).delete()
     print(Route.objects.get(title=number_map).exhibit.count())
     tr = Journey(
@@ -212,6 +213,17 @@ async def do_map(message: Message):
 
     await message.answer(
         text='Ну что погнали !',
+    )
+    ex = Route.objects.get(title=number_map)
+    await message.answer(
+        text=ex.description,
+    )
+    path = os.path.join(dirname, str(ex.route_map).replace('excursion/', ''))
+    image_from_pc = FSInputFile(path)
+    print(image_from_pc)
+    print(path)
+    await message.answer_photo(
+        image_from_pc,
     )
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -230,7 +242,7 @@ async def do_next(message: Message):
     )
 
 @router.message(Command('a'))
-async def do_next(message: Message):
+async def do_audio(message: Message):
     chat_id = message.from_user.id
 
     path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
@@ -243,7 +255,7 @@ async def do_next(message: Message):
     )
 
 @router.message(Command('list'))
-async def do_next(message: Message):
+async def do_list(message: Message):
     chat_id = message.from_user.id
     list_rout = Route.objects.all()
 
@@ -258,11 +270,18 @@ async def do_next(message: Message):
 
 @router.message()
 async def what_i_can_do(message: Message):
-    chat_id = message.from_user.id
+    user = message.from_user
 
     try:
-        f = Journey.objects.get(traveler=chat_id)  # MultipleObjectsReturned
-        print(f)
+        travel = Journey.objects.get(traveler=user.id)
+        if travel.now_exhibit:
+            ReviewOnExhibit(
+                exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
+                author=user.username,
+                contact=user.id,
+                text=message.text
+            ).save()
+
     except ObjectDoesNotExist:
         print("Объект не сушествует")
         return None
@@ -271,7 +290,7 @@ async def what_i_can_do(message: Message):
         return None
 
     await message.answer(
-        text='эхооооо'
+        text='спасибо!'
     )
 
 
