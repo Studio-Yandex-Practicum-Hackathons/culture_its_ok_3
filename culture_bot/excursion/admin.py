@@ -1,26 +1,8 @@
 from django.contrib import admin
 
-from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
-                     PhotoExhibit, ReflectionExhibit, Route, VideoExhibit)
+from .models import Route, Exhibit, ReviewOnExhibit, ReviewOnRoute
 
 
-class PhotoExhibitTabularInline(admin.TabularInline):
-    model = PhotoExhibit
-
-
-class AudioExhibitTabularInline(admin.TabularInline):
-    model = AudioExhibit
-
-
-class VideoExhibitTabularInline(admin.TabularInline):
-    model = VideoExhibit
-
-
-class DescriptionExhibitTabularInline(admin.TabularInline):
-    model = DescriptionExhibit
-
-
-@admin.register(Route)
 class RouteAdmin(admin.ModelAdmin):
     list_display = (
         "title",
@@ -32,25 +14,22 @@ class RouteAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-@admin.register(Exhibit)
 class ExhibitAdmin(admin.ModelAdmin):
-    inlines = [PhotoExhibitTabularInline, AudioExhibitTabularInline,
-               VideoExhibitTabularInline, DescriptionExhibitTabularInline]
     list_display = (
         "name",
+        "description",
         "address",
         "rating",
         "author",
         "route"
     )
-
+    search_fields = ("description",)
     list_filter = ("name", )
     empty_value_display = "-пусто-"
     list_editable = ("route",)
 
 
-@admin.register(ReflectionExhibit)
-class ReflectionExhibitAdmin(admin.ModelAdmin):
+class ReviewOnRouteAdmin(admin.ModelAdmin):
     list_display = (
         "text",
         "exhibit",
@@ -62,6 +41,19 @@ class ReflectionExhibitAdmin(admin.ModelAdmin):
     empty_value_display = "-пусто-"
 
 
-@admin.register(Journey)
-class JourneyAdmin(admin.ModelAdmin):
-    list_display = ('traveler', 'route', 'now_exhibit',)
+class ReviewOnExhibitAdmin(admin.ModelAdmin):
+    list_display = (
+        "text",
+        "route",
+        "author",
+        "contact",
+    )
+    search_fields = ("text", "route",)
+    list_filter = ("author", "route")
+    empty_value_display = "-пусто-"
+
+
+admin.site.register(Route, RouteAdmin)
+admin.site.register(Exhibit, ExhibitAdmin)
+admin.site.register(ReviewOnRoute, ReviewOnExhibitAdmin)
+admin.site.register(ReviewOnExhibit, ReviewOnRouteAdmin)
