@@ -9,6 +9,9 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile, Message
 from dotenv import load_dotenv
 
+from api_django import create_userfeedback, create_exhibit_comment_and_raiting
+
+
 load_dotenv()
 
 dirname = os.path.dirname(__file__)
@@ -115,6 +118,10 @@ async def choise_way(message: Message):
         os.path.join(dirname, 'pictures', 'covers', covers[message.text])
     )
     way_counter[message.from_user.id][0] = int(ways[message.text])
+    await create_userfeedback(
+        telegram_id=message.from_user.id,
+        route_id=way_counter[message.from_user.id][0]
+    )
     await message.answer_photo(
         cover_from_pc,
     )
