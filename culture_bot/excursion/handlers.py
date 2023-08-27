@@ -3,26 +3,24 @@ import sys
 
 from aiogram import F, Router
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import FSInputFile, Message, CallbackQuery
+from aiogram.types import FSInputFile, Message
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from dotenv import load_dotenv
 
 from .custom_keyboard import *
 from .messages import *
-from .models import (Exhibit, Journey, Profile, ReviewOnExhibit, ReviewOnRoute,
-                     Route)
+from .models import Exhibit, Journey, ReflectionExhibit, Route
 
 load_dotenv()
 
 dirname = os.path.dirname(__file__)
 
-MAX_PLACES = (8, 6, 10)
 
 router = Router()
 
 way_counter = [0, 0]
+
 
 class Cult_cuestions(StatesGroup):
     question_1 = State()
@@ -56,68 +54,6 @@ async def start_bot(message: Message):
         CHOISE_YOUR_WAY,
         reply_markup=keyboard_ways
     )
-    way_counter[message.from_user.id] = [0, 0]
-    return way_counter
-
-
-@router.message(F.text == 'Да')
-@router.message(F.text == 'Идём дальше!')
-async def exhibit(message: Message, state: FSMContext):
-    if way_counter[message.from_user.id][1] == 0:
-        # начало медитации
-        await message.answer(START_MEDITATION)
-    else:
-        # идем дальше
-        await message.answer(MOVE_ON)
-
-    # проверка конец ли это маршрута или нет
-    if (way_counter[message.from_user.id][1] < MAX_PLACES[way_counter[message.from_user.id][0] - 1]):
-        way_counter[message.from_user.id][1] = (
-            way_counter[message.from_user.id][1] + 1
-        )
-
-        # название места
-        await message.answer(
-            NAME_OF_PLACE[way_counter[message.from_user.id][0]][
-                way_counter[message.from_user.id][1] - 1]
-        )
-
-        # адрес места
-        await message.answer(
-            ADDRESSES[way_counter[message.from_user.id][0]][
-                way_counter[message.from_user.id][1] - 1]
-        )
-
-        # как пройти
-        await message.answer(
-            HOW_TO_PASS[way_counter[message.from_user.id][0]][
-                way_counter[message.from_user.id][1] - 1]
-        )
-
-        # Если текст подводка есть
-        if INTRODUCTORY_TEXT[way_counter[message.from_user.id][0]][
-                way_counter[message.from_user.id][1] - 1] != '':
-            await message.answer(
-                INTRODUCTORY_TEXT[way_counter[message.from_user.id][0]][
-                    way_counter[message.from_user.id][1] - 1]
-            )
-            await message.answer(WRITE_YOUR_OPINION)
-            # Ждём ввода текста
-            await state.set_state(Cult_cuestions.question_1)
-        # вариант, когда нет подводки
-        else:
-            await after_get_answer_1(message, state)
-    else:
-        # Поздравляем! Вы завершили маршрут.
-        await message.answer(
-            END_OF_WAY
-        )
-
-        # ссылка на форму обратной связи
-        await message.answer(
-            END_WAY_MESSAGE,
-            reply_markup=keyboard_menu
-        )
 
 
 @router.message(F.text == 'Завершить маршрут')
@@ -147,7 +83,8 @@ async def about(message: Message):
 async def what_i_an_do(message: Message):
     await message.answer(WHAT_I_CAN_DO, reply_markup=keyboard_menu)
 
-
+@router.message(F.text == 'Да')
+@router.message(F.text == 'Идём дальше!')
 @router.message(Command('next'))
 async def do_next(message: Message):
     chat_id = message.from_user.id
@@ -163,16 +100,42 @@ async def do_next(message: Message):
             await message.answer(text=i.text)
 
         # отправка нескольких фоток
-        for i in ex.photo_exhibit.all():
-            path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
-            image_from_pc = FSInputFile(path)
-            print(image_from_pc)
-            print(path)
-            caption = i.description if i.description else ''
-            await message.answer_photo(
-                image_from_pc,
-                caption=caption
-            )
+        try:
+            if ex.photo_exhibit.count() > 0:
+                for i in ex.photo_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    image_from_pc = FSInputFile(path)
+                    caption = i.description if i.description else ''
+                    await message.answer_photo(
+                        image_from_pc,
+                        caption=caption
+                    )
+        except:
+            pass
+
+        # отправка аудио
+        try:
+            if ex.audio_exhibit.count() > 0:
+                for i in ex.audio_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    audio_from_pc = FSInputFile(path)
+                    await message.answer_audio(
+                        audio_from_pc,
+                    )
+        except:
+            pass
+
+        # отправка видео
+        try:
+            if ex.video_exhibit.count() > 0:
+                for i in ex.video_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    video_from_pc = FSInputFile(path)
+                    await message.answer_audio(
+                        video_from_pc,
+                    )
+        except:
+            pass
 
         await message.answer(text=ex.question_for_reflection)
 
@@ -187,21 +150,6 @@ async def do_next(message: Message):
             END_WAY_MESSAGE,
             reply_markup=keyboard_menu
         )
-
-    # ответ на рефлексию
-    if AFTER_ANSWER[way_counter[message.from_user.id][0]][way_counter[message.from_user.id][1] - 1] != '':
-        await message.answer(
-            AFTER_ANSWER[way_counter[message.from_user.id][0]][way_counter[message.from_user.id][1] - 1])
-
-    # Оценка работы
-    await message.answer(RAITING_MESSAGE, reply_markup=keyboard_rating)
-
-    # Ждём ввода текста
-    await state.set_state(Cult_cuestions.raiting)
-
-    # супер
-    await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
-    return way_counter
 
 
 @router.message(Command('map'))
@@ -253,12 +201,19 @@ async def free_communication(message: Message):
     try:
         travel = Journey.objects.get(traveler=user.id)
         if travel.now_exhibit:
-            ReviewOnExhibit(
+            ReflectionExhibit(
                 exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
                 author=user.username,
                 contact=user.id,
                 text=message.text
             ).save()
+
+        # ответ на рефлексию
+        await message.answer(
+            text=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection
+        )
+
+        return None
 
     except ObjectDoesNotExist:
         print("Объект не сушествует")
@@ -266,65 +221,72 @@ async def free_communication(message: Message):
     except MultipleObjectsReturned:
         print("Найдено более одного объекта")
         return None
+    #
+    # await message.answer(
+    #     text='Спасибо, за ваш отзыв!'
+    # )
 
-    await message.answer(
-        text='Спасибо, за ваш отзыв!'
-    )
+    # # Оценка работы
+    # await message.answer(RAITING_MESSAGE, reply_markup=keyboard_rating)
+    #
+    # # супер
+    # await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
+    # return way_counter
 
 #------------------
-@router.message(Command('count'))
-async def do_count(message: Message):
-    chat_id = message.from_user.id
-
-    p, _ = Profile.objects.get_or_create(
-        external_id=chat_id,
-        defaults={
-            'name': message.from_user.first_name,
-        }
-    )
-    count = Message.objects.filter(profile=p).count()
-
-    # count = 0
-    await message.answer(
-        text=f'У вас {count} сообщений',
-    )
-
-@router.message(Command('list'))
-async def do_list(message: Message):
-    chat_id = message.from_user.id
-    list_rout = Route.objects.all()
-
-    path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
-    print(path)
-    image_from_pc = FSInputFile(path)
-    print(image_from_pc)
-    for r in list_rout:
-        await message.answer(
-            text=r.title
-        )
-
-@router.message(Command('a'))
-async def do_audio(message: Message):
-    chat_id = message.from_user.id
-
-    path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
-    print(path)
-    image_from_pc = FSInputFile(path)
-    print(image_from_pc)
-    await message.answer_audio(
-        image_from_pc,
-        caption="фотка экспоната"
-    )
-
-@router.message(Command('v'))
-async def do_next(message: Message):
-    chat_id = message.from_user.id
-
-    path = os.path.join(dirname, 'pictures/IMG_6528.mp4')
-    print(path)
-    image_from_pc = FSInputFile(path)
-    print(image_from_pc)
-    await message.answer_video(
-        image_from_pc,
-        caption="фотка экспоната"
-    )
+# @router.message(Command('count'))
+# async def do_count(message: Message):
+#     chat_id = message.from_user.id
+#
+#     p, _ = Profile.objects.get_or_create(
+#         external_id=chat_id,
+#         defaults={
+#             'name': message.from_user.first_name,
+#         }
+#     )
+#     count = Message.objects.filter(profile=p).count()
+#
+#     # count = 0
+#     await message.answer(
+#         text=f'У вас {count} сообщений',
+#     )
+#
+# @router.message(Command('list'))
+# async def do_list(message: Message):
+#     chat_id = message.from_user.id
+#     list_rout = Route.objects.all()
+#
+#     path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
+#     print(path)
+#     image_from_pc = FSInputFile(path)
+#     print(image_from_pc)
+#     for r in list_rout:
+#         await message.answer(
+#             text=r.title
+#         )
+#
+# @router.message(Command('a'))
+# async def do_audio(message: Message):
+#     chat_id = message.from_user.id
+#
+#     path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
+#     print(path)
+#     image_from_pc = FSInputFile(path)
+#     print(image_from_pc)
+#     await message.answer_audio(
+#         image_from_pc,
+#         caption="фотка экспоната"
+#     )
+#
+# @router.message(Command('v'))
+# async def do_next(message: Message):
+#     chat_id = message.from_user.id
+#
+#     path = os.path.join(dirname, 'pictures/IMG_6528.mp4')
+#     print(path)
+#     image_from_pc = FSInputFile(path)
+#     print(image_from_pc)
+#     await message.answer_video(
+#         image_from_pc,
+#         caption="фотка экспоната"
+#     )

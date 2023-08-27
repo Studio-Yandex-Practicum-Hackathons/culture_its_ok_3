@@ -5,6 +5,7 @@ import os
 from aiogram import Bot, Dispatcher
 from django.core.management.base import BaseCommand
 from dotenv import load_dotenv
+
 from excursion.handlers import router
 from excursion.models import *
 

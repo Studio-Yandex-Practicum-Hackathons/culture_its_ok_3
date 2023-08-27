@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Exhibit, ReviewOnExhibit, ReviewOnRoute, Route
+from .models import Exhibit, ReflectionExhibit, Route
 
 
 class ExhibitForm(forms.ModelForm):
@@ -17,27 +17,5 @@ class RouteForm(forms.ModelForm):
 
 class ReviewOnExhibitForm(forms.ModelForm):
     class Meta:
-        model = ReviewOnExhibit
+        model = ReflectionExhibit
         fields = ("author", "text", "exhibit")
-
-
-class ReviewOnRouteForm(forms.ModelForm):
-    class Meta:
-        model = ReviewOnRoute
-        fields = ("author", "text", "route")
-
-#-------------
-from .models import Profile
-
-
-class ProfileForm(forms.ModelForm):
-
-    class Meta:
-        model = Profile
-        fields = (
-            'external_id',
-            'name',
-        )
-        widgets = {
-            'name': forms.TextInput,
-        }

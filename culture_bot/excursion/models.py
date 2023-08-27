@@ -55,9 +55,6 @@ class Exhibit(models.Model):
         max_length=200,
         verbose_name="Название экспоната",
     )
-    description = models.TextField(
-        verbose_name="Описание экспоната",
-    )
     address = models.CharField(
         max_length=200,
         verbose_name="Адрес",
@@ -126,6 +123,7 @@ class DescriptionExhibit(models.Model):
     )
     text = models.TextField()
 
+
 class AudioExhibit(models.Model):
     exhibit = models.ForeignKey(
         Exhibit,
@@ -156,7 +154,7 @@ class VideoExhibit(models.Model):
     video = models.FileField(upload_to='videos/')
 
 
-class Reviews(models.Model):
+class ReflectionExhibit(models.Model):
     author = models.CharField(
         max_length=20,
         verbose_name="Комментатор",
@@ -169,77 +167,19 @@ class Reviews(models.Model):
     contact = models.CharField(
         max_length=50
     )
-
-
-class ReviewOnRoute(Reviews):
-    route = models.ForeignKey(
-        Route,
-        on_delete=models.CASCADE,
-        related_name="review_on_route",
-        verbose_name="Комментируемый маршрут",
-    )
-
-    class Meta:
-        verbose_name = "Комментарий на маршрут"
-        verbose_name_plural = "Комментарии на маршруты"
-
-    def __str__(self):
-        return self.text[1:20]
-
-
-class ReviewOnExhibit(Reviews):
     exhibit = models.ForeignKey(
         Exhibit,
         on_delete=models.CASCADE,
-        related_name="review_on_exhibit",
-        verbose_name="Комментируемый экспонат",
+        related_name="reflection_exhibit",
+        verbose_name="Рефлексия на экспонат",
     )
 
     class Meta:
-        verbose_name = "Комментарий на экспонат"
-        verbose_name_plural = "Комментарии на экспонаты"
+        verbose_name = "Рефлексия на экспонат"
+        verbose_name_plural = "Рефлексия  на экспонаты"
 
     def __str__(self):
         return self.text[1:20]
-
-
-class Profile(models.Model):
-    external_id = models.PositiveIntegerField(
-        verbose_name='Внешний ID пользователя',
-        unique=True,
-    )
-    name = models.TextField(
-        verbose_name='Имя пользователя',
-    )
-
-    def __str__(self):
-        return f'#{self.external_id} {self.name}'
-
-    class Meta:
-        verbose_name = 'Профиль'
-        verbose_name_plural = 'Профили'
-
-
-class Message(models.Model):
-    profile = models.ForeignKey(
-        to='Profile',
-        verbose_name='Профиль',
-        on_delete=models.PROTECT,
-    )
-    text = models.TextField(
-        verbose_name='Текст',
-    )
-    created_at = models.DateTimeField(
-        verbose_name='Время получения',
-        auto_now_add=True,
-    )
-
-    def __str__(self):
-        return f'Сообщение {self.pk} от {self.profile}'
-
-    class Meta:
-        verbose_name = 'Сообщение'
-        verbose_name_plural = 'Сообщения'
 
 
 class Journey(models.Model):
