@@ -1,12 +1,12 @@
 from django import forms
 
-from .models import Exhibit, ReflectionExhibit, Route
+from .models import Exhibit, Route, ReviewOnExhibit, ReviewOnRoute
 
 
 class ExhibitForm(forms.ModelForm):
     class Meta:
         model = Exhibit
-        fields = ("name", "description", "address")
+        fields = ("name", "image", "description", "address")
 
 
 class RouteForm(forms.ModelForm):
@@ -17,5 +17,11 @@ class RouteForm(forms.ModelForm):
 
 class ReviewOnExhibitForm(forms.ModelForm):
     class Meta:
-        model = ReflectionExhibit
+        model = ReviewOnExhibit
         fields = ("author", "text", "exhibit")
+
+
+class ReviewOnRouteForm(forms.ModelForm):
+    class Meta:
+        model = ReviewOnRoute
+        fields = ("author", "text", "route")
