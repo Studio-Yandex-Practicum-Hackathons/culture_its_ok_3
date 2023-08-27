@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from excursion.models import (Exhibit, Journey, Message, Profile,
+                              ReviewOnExhibit, ReviewOnRoute, Route)
 from telegram import Bot, Update
 from telegram.ext import (CallbackContext, CommandHandler, Filters,
                           MessageHandler, Updater)
 from telegram.utils.request import Request
-
-from excursion.models import (Exhibit, Journey, Message, Profile,
-                              ReviewOnExhibit, ReviewOnRoute, Route)
 
 
 def log_errors(f):

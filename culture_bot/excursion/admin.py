@@ -1,7 +1,12 @@
 from django.contrib import admin
 
-from .models import Exhibit, Journey, ReviewOnExhibit, ReviewOnRoute, Route
+from .forms import ProfileForm
+from .models import (Exhibit, Journey, Message, Profile, ReviewOnExhibit,
+                     ReviewOnRoute, Route, PhotoExhibit)
 
+
+class PhotoExhibitTabularInline(admin.TabularInline):
+    model = PhotoExhibit
 
 class RouteAdmin(admin.ModelAdmin):
     list_display = (
@@ -15,6 +20,7 @@ class RouteAdmin(admin.ModelAdmin):
 
 
 class ExhibitAdmin(admin.ModelAdmin):
+    inlines = [PhotoExhibitTabularInline]
     list_display = (
         "name",
         "description",
@@ -51,9 +57,6 @@ class ReviewOnExhibitAdmin(admin.ModelAdmin):
     search_fields = ("text", "route",)
     list_filter = ("author", "route")
     empty_value_display = "-пусто-"
-
-from .forms import ProfileForm
-from .models import Message, Profile
 
 
 @admin.register(Profile)

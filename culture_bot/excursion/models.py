@@ -17,6 +17,7 @@ class Route(models.Model):
     )
     rating = models.IntegerField(
         verbose_name="Рейтинг",
+        default=0,
     )
 
     class Meta:
@@ -30,7 +31,6 @@ class Route(models.Model):
 class Exhibit(models.Model):
     route = models.ForeignKey(
         Route,
-        blank=True,
         null=True,
         on_delete=models.SET_NULL,
         related_name="exhibit",
@@ -42,12 +42,6 @@ class Exhibit(models.Model):
     )
     description = models.TextField(
         verbose_name="Описание экспоната",
-    )
-    image = models.ImageField(
-        upload_to='excursion/exhibit/',
-        blank=True,
-        verbose_name="Картинка",
-        help_text="Добавьте картинку экспоната",
     )
     address = models.CharField(
         max_length=200,
@@ -71,13 +65,42 @@ class Exhibit(models.Model):
 
     order = models.PositiveIntegerField()
 
+    def save(self):
+        order = Route.objects.get(title=self.route.title).exhibit.count()
+        self.order = order + 1
+        super(Exhibit, self).save()
+
     class Meta:
         verbose_name = "Экспонат"
         verbose_name_plural = "Экспонаты"
-        # todo добавить ограничение  на мару путь и номер, должны быть уникальными
+
+        models.UniqueConstraint(
+            fields=('route', 'order'),
+            name='unique_route_for_order'
+        ),
 
     def __str__(self):
         return self.name
+
+
+class PhotoExhibit(models.Model):
+    exhibit = models.ForeignKey(
+        Exhibit,
+        on_delete=models.CASCADE,
+        related_name='photo_exhibit'
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
+    photo = models.ImageField(
+        upload_to='excursion/exhibit/',
+        blank=True,
+        verbose_name="Фотографии экспонатов",
+        help_text="Добавьте картинку экспоната",
+    )
 
 
 class Reviews(models.Model):
@@ -126,7 +149,7 @@ class ReviewOnExhibit(Reviews):
     def __str__(self):
         return self.text[1:20]
 
-#-------------------
+
 class Profile(models.Model):
     external_id = models.PositiveIntegerField(
         verbose_name='Внешний ID пользователя',
@@ -167,15 +190,10 @@ class Message(models.Model):
 
 
 class Journey(models.Model):
-    # traveler = models.ForeignKey(
-    #     Profile,
-    #     verbose_name='Профиль',
-    #     on_delete=models.PROTECT,
-    # )
-
     traveler = models.PositiveIntegerField()
     route = models.ForeignKey(
         Route,
         on_delete=models.CASCADE,
+        null=True
     )
     now_exhibit = models.PositiveIntegerField()

@@ -6,7 +6,7 @@ from .models import Exhibit, ReviewOnExhibit, ReviewOnRoute, Route
 class ExhibitForm(forms.ModelForm):
     class Meta:
         model = Exhibit
-        fields = ("name", "image", "description", "address")
+        fields = ("name", "description", "address")
 
 
 class RouteForm(forms.ModelForm):
