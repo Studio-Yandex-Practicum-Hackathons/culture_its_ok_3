@@ -1,27 +1,26 @@
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
+                           KeyboardButton, ReplyKeyboardMarkup)
+
+from .models import Route
+
+routs = Route.objects.all()
+
+button_ways = [
+    *[[KeyboardButton(text=f'/map {rout.title}')] for rout in routs],
+    [KeyboardButton(text='О проекте')],
+    [KeyboardButton(text='Что ты умеешь?')],
+]
 
 keyboard_ways = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(
-            text='Маршрут 1. "Руки бы им оторвать"'
-        ), ],
-        [KeyboardButton(
-            text='Маршрут 2. "Не с кем играть. Играю со стенкой"'
-        ), ],
-        [KeyboardButton(
-            text='Маршрут 3. "… но спи/СМИ спокойно"'
-        ), ],
-        [KeyboardButton(text='О проекте'), ],
-        [KeyboardButton(text='Что ты умеешь?'), ]
-    ],
+    keyboard=button_ways,
     resize_keyboard=True,
     one_time_keyboard=True
 )
 
 keyboard_yes_no = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Да'), ],
-        [KeyboardButton(text='Нет'), ],
+        [KeyboardButton(text='/yes'), ],
+        [KeyboardButton(text='/no'), ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -29,8 +28,8 @@ keyboard_yes_no = ReplyKeyboardMarkup(
 
 keyboard_go_on_or_stop = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Идём дальше!'), ],
-        [KeyboardButton(text='Завершить маршрут'), ],
+        [KeyboardButton(text='/next'), ],
+        [KeyboardButton(text='/end'), ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -38,8 +37,8 @@ keyboard_go_on_or_stop = ReplyKeyboardMarkup(
 
 keyboard_yes_or_stop = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='Да'), ],
-        [KeyboardButton(text='Завершить маршрут'), ],
+        [KeyboardButton(text='/yes'), ],
+        [KeyboardButton(text='/end'), ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'telegram_bot.apps.TelegramBotConfig',
     'rest_framework',
     'google_api.apps.GoogleApiConfig',
     'api.apps.ApiConfig',

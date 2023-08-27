@@ -1,15 +1,13 @@
 import os
 
-from aiogram import F, Router
-from aiogram.filters import Command
-from aiogram.types import FSInputFile, Message
-from dotenv import load_dotenv
-
 import custom_keyboard
 import messages
-
-from aiogram.fsm.state import StatesGroup, State
+from aiogram import F, Router
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import FSInputFile, Message
+from dotenv import load_dotenv
 
 from api_django import create_userfeedback, create_exhibit_comment_and_raiting
 
@@ -275,8 +273,6 @@ async def after_get_answer_1(message: Message, state: FSMContext):
         reply_markup=custom_keyboard.keyboard_rating
     )
     # Ждём ввода текста
-    if message.text:
-        await state.update_data(question_1_text=message.text)
     await state.set_state(Cult_cuestions.raiting)
     # await message.answer(
     #     messages.GREAT,
@@ -286,15 +282,7 @@ async def after_get_answer_1(message: Message, state: FSMContext):
 
 
 @router.message(Cult_cuestions.raiting)
-async def after_get_raiting(message: Message, state: FSMContext):
-    data = await state.get_data()
-    await create_exhibit_comment_and_raiting(
-        text=data['question_1_text'] if data['question_1_text'] else '',
-        telegram_id=message.from_user.id,
-        route_id=way_counter[message.from_user.id][0],
-        exhibit_name=way_counter[message.from_user.id][1],
-        rating_exhibit=message.text
-    )
+async def after_get_raiting(message: Message):
     await message.answer(
         messages.RAITING_THANKS,
         reply_markup=custom_keyboard.keyboard_go_on_or_stop
