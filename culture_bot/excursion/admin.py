@@ -2,11 +2,17 @@ from django.contrib import admin
 
 from .forms import ProfileForm
 from .models import (Exhibit, Journey, Message, Profile, ReviewOnExhibit,
-                     ReviewOnRoute, Route, PhotoExhibit)
+                     ReviewOnRoute, Route, PhotoExhibit, AudioExhibit, VideoExhibit)
 
 
 class PhotoExhibitTabularInline(admin.TabularInline):
     model = PhotoExhibit
+
+class AudioExhibitTabularInline(admin.TabularInline):
+    model = AudioExhibit
+
+class VideoExhibitTabularInline(admin.TabularInline):
+    model = VideoExhibit
 
 class RouteAdmin(admin.ModelAdmin):
     list_display = (
@@ -20,7 +26,7 @@ class RouteAdmin(admin.ModelAdmin):
 
 
 class ExhibitAdmin(admin.ModelAdmin):
-    inlines = [PhotoExhibitTabularInline]
+    inlines = [PhotoExhibitTabularInline, AudioExhibitTabularInline, VideoExhibitTabularInline]
     list_display = (
         "name",
         "description",

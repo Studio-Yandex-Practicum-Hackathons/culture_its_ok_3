@@ -7,7 +7,11 @@ class Route(models.Model):
         verbose_name="Название маршрута",
     )
     description = models.TextField(
-        verbose_name="Описание экспоната",
+        verbose_name="Описание маршрута",
+    )
+    lyrics = models.TextField(
+        verbose_name="Лирическое описание",
+        default='',
     )
     route_map = models.ImageField(
         upload_to='excursion/router_map/',
@@ -15,9 +19,20 @@ class Route(models.Model):
         verbose_name="Карта маршрута",
         help_text="Добавьте карту маршрута",
     )
+
+    cover = models.ImageField(
+        upload_to='excursion/cover/',
+        blank=True,
+        verbose_name="Обложка маршрута",
+        help_text="Добавьте обложку маршрута",
+    )
+
     rating = models.IntegerField(
         verbose_name="Рейтинг",
         default=0,
+    )
+    where_start = models.TextField(
+        verbose_name="Как пройти к старту",
     )
 
     class Meta:
@@ -101,6 +116,44 @@ class PhotoExhibit(models.Model):
         verbose_name="Фотографии экспонатов",
         help_text="Добавьте картинку экспоната",
     )
+
+
+class DescriptionExhibit(models.Model):
+    exhibit = models.ForeignKey(
+        Exhibit,
+        on_delete=models.CASCADE,
+        related_name='description_exhibit'
+    )
+    text = models.TextField()
+
+class AudioExhibit(models.Model):
+    exhibit = models.ForeignKey(
+        Exhibit,
+        on_delete=models.CASCADE,
+        related_name='audio_exhibit'
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
+    audio = models.FileField(upload_to='audios/')
+
+
+class VideoExhibit(models.Model):
+    exhibit = models.ForeignKey(
+        Exhibit,
+        on_delete=models.CASCADE,
+        related_name='video_exhibit'
+    )
+    description = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True
+    )
+
+    video = models.FileField(upload_to='videos/')
 
 
 class Reviews(models.Model):
