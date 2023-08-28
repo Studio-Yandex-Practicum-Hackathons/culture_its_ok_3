@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'google_api.apps.GoogleApiConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +123,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+FORMAT = "%Y/%m/%d %H:%M:%S"
+
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
+EMAIL = os.getenv('EMAIL')
+INFO = {
+    'type': os.getenv('TYPE'),
+    'project_id': os.getenv('PROJECT_ID'),
+    'private_key_id': os.getenv('PRIVATE_KEY_ID'),
+    'private_key': os.getenv('PRIVATE_KEY'),
+    'client_email': os.getenv('CLIENT_EMAIL'),
+    'client_id': os.getenv('CLIENT_ID'),
+    'auth_uri': os.getenv('AUTH_URI'),
+    'token_uri': os.getenv('TOKEN_URI'),
+    'auth_provider_x509_cert_url': os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+    'client_x509_cert_url': os.getenv('CLIENT_X509_CERT_URL')
+}
+
+SHEET_ID = 0
+ROW_COUNT = 100
+COLUMN_COUNT = 11
+RANGE_UPDATE = 'A1:E30'
