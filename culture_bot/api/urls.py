@@ -1,10 +1,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from api.views import (
-    CreateGoogleGeneralReportViewSet, ExhibitCommentViewSet, ExhibitViewSet,
-    RouteReviewViewSet, RouteViewSet, UserFeedbackViewSet,
-)
+from api.views import (CreateGoogleGeneralReportViewSet, ExhibitCommentViewSet,
+                       ExhibitViewSet, RouteReviewViewSet, RouteViewSet,
+                       UserFeedbackViewSet)
 
 router = DefaultRouter()
 router.register(r'user-feedback', UserFeedbackViewSet, basename='user-feedback')

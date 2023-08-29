@@ -7,14 +7,10 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile, Message
+from api_django import (create_exhibit_comment_and_raiting,
+                        create_route_review_and_raiting, create_userfeedback,
+                        update_userfeedback)
 from dotenv import load_dotenv
-
-from api_django import (
-    create_exhibit_comment_and_raiting,
-    create_userfeedback,
-    create_route_review_and_raiting,
-    update_userfeedback
-)
 
 load_dotenv()
 

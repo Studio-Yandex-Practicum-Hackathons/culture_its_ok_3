@@ -3,6 +3,9 @@ from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
 
 from .models import Route
 
+from random import randint
+from .messages import *
+
 routs = Route.objects.all()
 
 button_ways = [
@@ -28,8 +31,8 @@ keyboard_yes_no = ReplyKeyboardMarkup(
 
 keyboard_go_on_or_stop = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='/next'), ],
-        [KeyboardButton(text='/end'), ],
+        [KeyboardButton(text=LET_MOVE_ON[randint(0, len(LET_MOVE_ON)-1)], )],
+        [KeyboardButton(text='Завершить медитацию'), ],
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -62,6 +65,24 @@ keyboard_rating = ReplyKeyboardMarkup(
          KeyboardButton(text='8',), KeyboardButton(text='9',),
          KeyboardButton(text='10',)
          ],
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+keyboard_ready = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text='Я готов',), ],
+        [KeyboardButton(text=SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)])]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+keyboard_only_ready = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text='Я готов',), ],
+        [KeyboardButton(text='Завершить медитацию')]
     ],
     resize_keyboard=True,
     one_time_keyboard=True

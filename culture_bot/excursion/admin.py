@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Avg
 
 from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
                      PhotoExhibit, ReflectionExhibit, Route, VideoExhibit)
@@ -25,10 +26,8 @@ class RouteAdmin(admin.ModelAdmin):
     list_display = (
         "title",
         "description",
-        "rating"
     )
     search_fields = ("description", "title")
-    list_filter = ("rating",)
     empty_value_display = "-пусто-"
 
 
@@ -39,14 +38,15 @@ class ExhibitAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "address",
-        "rating",
         "author",
         "route"
     )
-
+    # inlines = (ExhibitRetingInline,)
     list_filter = ("name", )
     empty_value_display = "-пусто-"
     list_editable = ("route",)
+
+
 
 
 @admin.register(ReflectionExhibit)

@@ -8,24 +8,23 @@ from aiogram.types import FSInputFile, Message
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from dotenv import load_dotenv
 
+from google_api.models import ExhibitComment, RouteReview, UserFeedback
+
 from .custom_keyboard import *
 from .messages import *
 from .models import Exhibit, Journey, ReflectionExhibit, Route
-from google_api.models import UserFeedback, ExhibitComment, RouteReview
 
 load_dotenv()
 
 dirname = os.path.dirname(__file__)
 
-
 router = Router()
-
-way_counter = [0, 0]
 
 
 class Cult_cuestions(StatesGroup):
     question_1 = State()
     raiting = State()
+
 
 @router.message(Command('start'))
 @router.message(F.text == 'Меню')
@@ -35,13 +34,6 @@ async def start_bot(message: Message):
         reply_markup=keyboard_ways
     )
 
-    image_from_pc = FSInputFile(
-        os.path.join(dirname, r'pictures\map.jpg')
-    )
-    await message.answer_photo(
-        image_from_pc,
-        caption="Карта фестиваля"
-    )
     await message.answer(
         WELCOME_MESSAGE,
     )
@@ -57,23 +49,12 @@ async def start_bot(message: Message):
     )
 
 
-@router.message(F.text == 'Завершить маршрут')
+@router.message(F.text == 'Завершить медитацию')
+@router.message(Command('end'))
 async def stop_journey(message: Message):
+    Journey.objects.get(traveler=message.from_user.id).delete()
     await message.answer(STOP_JOURNY, reply_markup=keyboard_menu)
 
-@router.message(Cult_cuestions.raiting)
-async def after_get_raiting(message: Message):
-    await message.answer(RAITING_THANKS, reply_markup=keyboard_go_on_or_stop)
-
-
-# если находимся не рядом с местом медитации
-@router.message(F.text == 'Нет')
-async def not_start_place(message: Message):
-
-    await message.answer(MEDITATION_ADRESS)
-    await message.answer(ADDRESSES[way_counter[message.from_user.id][0]][way_counter[message.from_user.id][1] - 1])
-    await message.answer(NOT_START_PLACE)
-    await message.answer(START_WAY_QUESTION, reply_markup=keyboard_yes_or_stop)
 
 @router.message(F.text == 'О проекте')
 async def about(message: Message):
@@ -84,10 +65,10 @@ async def about(message: Message):
 async def what_i_an_do(message: Message):
     await message.answer(WHAT_I_CAN_DO, reply_markup=keyboard_menu)
 
-@router.message(F.text == 'Да')
-@router.message(F.text == 'Идём дальше!')
+
+@router.message(F.text == 'Я готов')
 @router.message(Command('next'))
-async def do_next(message: Message):
+async def go_next_exhibit(message: Message):
     chat_id = message.from_user.id
 
     tr = Journey.objects.get(traveler=chat_id)
@@ -154,10 +135,23 @@ async def do_next(message: Message):
             reply_markup=keyboard_menu
         )
 
-async def do_map(message: Message):
+
+# если находимся не рядом с местом медитации
+async def not_start_place(message: Message):
     chat_id = message.from_user.id
 
-    number_map = str(message.text).replace('/map ', '')
+    tr = Journey.objects.get(traveler=chat_id)
+    await message.answer(MEDITATION_ADRESS)
+    await message.answer(tr.route.where_start)
+    await message.answer(NOT_START_PLACE)
+    await message.answer(START_WAY_QUESTION, reply_markup=keyboard_only_ready)
+
+
+#  выбор маршрута
+async def route_selection(message: Message):
+    chat_id = message.from_user.id
+
+    number_map = str(message.text)
 
     Journey.objects.filter(traveler=chat_id).delete()
     route = Route.objects.get(title=number_map)
@@ -195,12 +189,12 @@ async def do_map(message: Message):
     await message.answer(route.where_start)
 
     # 'Вы на месте?'
-    await message.answer(START_WAY_QUESTION)
-
+    await message.answer(START_WAY_QUESTION, reply_markup=keyboard_ready)
 
     return None
 
-async def free_communication(message: Message):
+
+async def processing_free_content(message: Message):
     user = message.from_user
     try:
         travel = Journey.objects.get(traveler=user.id)
@@ -219,8 +213,6 @@ async def free_communication(message: Message):
             text=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection
         )
 
-        # return None
-
     except ObjectDoesNotExist:
         print("Объект не сушествует")
         return None
@@ -228,17 +220,13 @@ async def free_communication(message: Message):
         print("Найдено более одного объекта")
         return None
 
-
-    await message.answer(text='Спасибо, за ваш отзыв!')
-
-    # # Оценка работы
+    await message.answer(text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION)-1)])
     await message.answer(RAITING_MESSAGE, reply_markup=keyboard_rating)
-    #
-    # # супер
-    # await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
+
     return None
 
-async def set_rating(message: Message):
+
+async def set_rating_exhibit(message: Message):
     user = message.from_user
     try:
         num = int(message.text)
@@ -256,10 +244,9 @@ async def set_rating(message: Message):
         elif 4 <= num < 7:
             await message.answer(text='Приятно видеть от вас такую оценку')
         else:
-            await message.answer(text='Большое спасибо! Мы передадим вашу оценку художнику :)')
+            await message.answer(text='Большое спасибо! Мы передадим вашу оценку автору :)')
 
         await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
-        # await message.answer(text='Ну что идем дальше', keyword=keyboard_yes_no)
 
     except ObjectDoesNotExist:
         print("Объект не сушествует")
@@ -272,74 +259,23 @@ async def set_rating(message: Message):
 @router.message(F.text)
 async def handle_message(message: Message):
     routs_all = [rout.title for rout in Route.objects.all()]
-    if message.text in routs_all:
-        print(1)
-        await do_map(message)
+    message_text = message.text
+    if message_text in routs_all:
+        await route_selection(message)
         return None
-    elif message.text.isdigit():
-        print(2)
-        await set_rating(message)
+
+    elif message_text.isdigit():
+        await set_rating_exhibit(message)
         return None
+
+    elif message_text in SEARCH_FOR_PLACE:
+        await not_start_place(message)
+        return None
+
+    elif message_text in LET_MOVE_ON:
+        await go_next_exhibit(message)
+        return None
+
     else:
-        print(3)
-        await free_communication(message)
+        await processing_free_content(message)
         return None
-
-
-#------------------
-# @router.message(Command('count'))
-# async def do_count(message: Message):
-#     chat_id = message.from_user.id
-#
-#     p, _ = Profile.objects.get_or_create(
-#         external_id=chat_id,
-#         defaults={
-#             'name': message.from_user.first_name,
-#         }
-#     )
-#     count = Message.objects.filter(profile=p).count()
-#
-#     # count = 0
-#     await message.answer(
-#         text=f'У вас {count} сообщений',
-#     )
-#
-# @router.message(Command('list'))
-# async def do_list(message: Message):
-#     chat_id = message.from_user.id
-#     list_rout = Route.objects.all()
-#
-#     path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
-#     print(path)
-#     image_from_pc = FSInputFile(path)
-#     print(image_from_pc)
-#     for r in list_rout:
-#         await message.answer(
-#             text=r.title
-#         )
-#
-# @router.message(Command('a'))
-# async def do_audio(message: Message):
-#     chat_id = message.from_user.id
-#
-#     path = os.path.join(dirname, 'pictures/9.Гороховый бранль.mp3')
-#     print(path)
-#     image_from_pc = FSInputFile(path)
-#     print(image_from_pc)
-#     await message.answer_audio(
-#         image_from_pc,
-#         caption="фотка экспоната"
-#     )
-#
-# @router.message(Command('v'))
-# async def do_next(message: Message):
-#     chat_id = message.from_user.id
-#
-#     path = os.path.join(dirname, 'pictures/IMG_6528.mp4')
-#     print(path)
-#     image_from_pc = FSInputFile(path)
-#     print(image_from_pc)
-#     await message.answer_video(
-#         image_from_pc,
-#         caption="фотка экспоната"
-#     )

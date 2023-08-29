@@ -4,10 +4,9 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.serializers import (
-    ExhibitCommentSerializer, ExhibitSerializer, RouteReviewSerializer,
-    RouteSerializer, UserFeedbackSerializer
-)
+from api.serializers import (ExhibitCommentSerializer, ExhibitSerializer,
+                             RouteReviewSerializer, RouteSerializer,
+                             UserFeedbackSerializer)
 from api.utils import get_data_from_db
 from excursion.models import Exhibit, Route
 from google_api.google_client import create_general_report

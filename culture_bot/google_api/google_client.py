@@ -2,10 +2,9 @@ from aiogoogle import Aiogoogle
 from aiogoogle.auth.creds import ServiceAccountCreds
 
 from culture_bot import settings
-from .google_api import (
-    set_user_permissions, spreadsheets_create, spreadsheets_update_value
-)
 
+from .google_api import (set_user_permissions, spreadsheets_create,
+                         spreadsheets_update_value)
 
 cred = ServiceAccountCreds(scopes=settings.SCOPES, **settings.INFO)
 
