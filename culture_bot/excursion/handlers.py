@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from .custom_keyboard import *
 from .messages import *
 from .models import Exhibit, Journey, ReflectionExhibit, Route
+from google_api.models import UserFeedback, ExhibitComment, RouteReview
 
 load_dotenv()
 
@@ -137,7 +138,9 @@ async def do_next(message: Message):
         except:
             pass
 
-        await message.answer(text=ex.question_for_reflection)
+        question_for_reflection = ex.question_for_reflection or None
+        if question_for_reflection:
+            await message.answer(text=question_for_reflection)
 
     else:
         tr.delete()
@@ -151,18 +154,21 @@ async def do_next(message: Message):
             reply_markup=keyboard_menu
         )
 
-
-@router.message(Command('map'))
 async def do_map(message: Message):
     chat_id = message.from_user.id
 
     number_map = str(message.text).replace('/map ', '')
 
     Journey.objects.filter(traveler=chat_id).delete()
+    route = Route.objects.get(title=number_map)
     tr = Journey(
         traveler=chat_id,
-        route=Route.objects.get(title=number_map),
+        route=route,
         now_exhibit=0
+    )
+    UserFeedback(
+        telegram_id=chat_id,
+        route=route
     )
     tr.save()
 
@@ -191,21 +197,21 @@ async def do_map(message: Message):
     # 'Вы на месте?'
     await message.answer(START_WAY_QUESTION)
 
-    return way_counter
 
+    return None
 
-@router.message()
 async def free_communication(message: Message):
     user = message.from_user
-
     try:
         travel = Journey.objects.get(traveler=user.id)
+
         if travel.now_exhibit:
             ReflectionExhibit(
                 exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
                 author=user.username,
                 contact=user.id,
-                text=message.text
+                text=message.text,
+                rating=1
             ).save()
 
         # ответ на рефлексию
@@ -213,7 +219,7 @@ async def free_communication(message: Message):
             text=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection
         )
 
-        return None
+        # return None
 
     except ObjectDoesNotExist:
         print("Объект не сушествует")
@@ -221,17 +227,64 @@ async def free_communication(message: Message):
     except MultipleObjectsReturned:
         print("Найдено более одного объекта")
         return None
-    #
-    # await message.answer(
-    #     text='Спасибо, за ваш отзыв!'
-    # )
+
+
+    await message.answer(text='Спасибо, за ваш отзыв!')
 
     # # Оценка работы
-    # await message.answer(RAITING_MESSAGE, reply_markup=keyboard_rating)
+    await message.answer(RAITING_MESSAGE, reply_markup=keyboard_rating)
     #
     # # супер
     # await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
-    # return way_counter
+    return None
+
+async def set_rating(message: Message):
+    user = message.from_user
+    try:
+        num = int(message.text)
+        print(num)
+        travel = Journey.objects.get(traveler=user.id)
+        refl = list(ReflectionExhibit.objects.filter(
+            exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
+            author=user.username,
+            contact=user.id))[-1]
+        print(refl)
+        refl.rating = num
+        refl.save()
+        if 1 <= num < 4:
+            await message.answer(text='Это нормально, что вам что-то не понравилось, спасибо за отзыв')
+        elif 4 <= num < 7:
+            await message.answer(text='Приятно видеть от вас такую оценку')
+        else:
+            await message.answer(text='Большое спасибо! Мы передадим вашу оценку художнику :)')
+
+        await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
+        # await message.answer(text='Ну что идем дальше', keyword=keyboard_yes_no)
+
+    except ObjectDoesNotExist:
+        print("Объект не сушествует")
+        return None
+    except MultipleObjectsReturned:
+        print("Найдено более одного объекта")
+        return None
+
+
+@router.message(F.text)
+async def handle_message(message: Message):
+    routs_all = [rout.title for rout in Route.objects.all()]
+    if message.text in routs_all:
+        print(1)
+        await do_map(message)
+        return None
+    elif message.text.isdigit():
+        print(2)
+        await set_rating(message)
+        return None
+    else:
+        print(3)
+        await free_communication(message)
+        return None
+
 
 #------------------
 # @router.message(Command('count'))

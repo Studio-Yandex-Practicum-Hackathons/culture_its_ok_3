@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Route(models.Model):
     title = models.CharField(
@@ -61,6 +61,7 @@ class Exhibit(models.Model):
     )
     rating = models.IntegerField(
         verbose_name="Рейтинг",
+        default=1
     )
     author = models.CharField(
         max_length=50,
@@ -69,13 +70,21 @@ class Exhibit(models.Model):
 
     question_for_reflection = models.TextField(
         verbose_name="Вопрос для рефлексии",
+        null=True,
+        blank=True,
     )
 
     answer_for_reflection = models.TextField(
         verbose_name="Ответ для рефлексии",
+        null=True,
+        blank=True,
     )
 
-    order = models.PositiveIntegerField()
+    where_start = models.TextField(
+        verbose_name="Как пройти к экспонату",
+    )
+
+    order = models.PositiveIntegerField(default=1)
 
     def save(self):
         order = Route.objects.get(title=self.route.title).exhibit.count()
@@ -172,6 +181,12 @@ class ReflectionExhibit(models.Model):
         on_delete=models.CASCADE,
         related_name="reflection_exhibit",
         verbose_name="Рефлексия на экспонат",
+    )
+    rating = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        default=1
     )
 
     class Meta:

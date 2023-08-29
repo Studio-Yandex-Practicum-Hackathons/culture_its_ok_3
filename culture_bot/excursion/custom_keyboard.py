@@ -6,7 +6,7 @@ from .models import Route
 routs = Route.objects.all()
 
 button_ways = [
-    *[[KeyboardButton(text=f'/map {rout.title}')] for rout in routs],
+    *[[KeyboardButton(text=rout.title)] for rout in routs],
     [KeyboardButton(text='О проекте')],
     [KeyboardButton(text='Что ты умеешь?')],
 ]
