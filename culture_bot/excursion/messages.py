@@ -63,6 +63,8 @@ RESPONSE_REFLECTION = [
     'Вы услышаны'
 ]
 
+
+
 WRITE_YOUR_OPINION = 'Напишите нам!\U0001F4DD'
 
 GREAT = 'Идем дальше!\U0001F929'

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.db.models import Avg
 
 from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
                      PhotoExhibit, ReflectionExhibit, Route, VideoExhibit)

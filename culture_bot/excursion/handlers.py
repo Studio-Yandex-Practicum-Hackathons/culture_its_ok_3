@@ -72,7 +72,8 @@ async def go_next_exhibit(message: Message):
     chat_id = message.from_user.id
 
     tr = Journey.objects.get(traveler=chat_id)
-    if tr.now_exhibit < Route.objects.get(title=tr.route.title).exhibit.count():
+    count_exhibit_on_rout = Route.objects.get(title=tr.route.title).exhibit.count()
+    if tr.now_exhibit < count_exhibit_on_rout:
         ex = Exhibit.objects.get(route__title=tr.route, order=tr.now_exhibit + 1)
 
         tr.now_exhibit = tr.now_exhibit + 1
@@ -123,17 +124,9 @@ async def go_next_exhibit(message: Message):
         if question_for_reflection:
             await message.answer(text=question_for_reflection)
 
-    else:
-        tr.delete()
-        await message.answer(
-            END_OF_WAY
-        )
-
-        # ссылка на форму обратной связи
-        await message.answer(
-            END_WAY_MESSAGE,
-            reply_markup=keyboard_menu
-        )
+    elif tr.now_exhibit == count_exhibit_on_rout:
+        tr.now_exhibit = tr.now_exhibit + 1
+        await processing_free_content(message)
 
 
 # если находимся не рядом с местом медитации
@@ -155,16 +148,16 @@ async def route_selection(message: Message):
 
     Journey.objects.filter(traveler=chat_id).delete()
     route = Route.objects.get(title=number_map)
-    tr = Journey(
+    Journey(
         traveler=chat_id,
         route=route,
         now_exhibit=0
-    )
+    ).save()
+
     UserFeedback(
         telegram_id=chat_id,
         route=route
-    )
-    tr.save()
+    ).save()
 
     route = Route.objects.get(title=number_map)
     cover = FSInputFile(os.path.join(dirname, str(route.cover).replace('excursion/', '')))
@@ -196,16 +189,31 @@ async def route_selection(message: Message):
 
 async def processing_free_content(message: Message):
     user = message.from_user
-    try:
-        travel = Journey.objects.get(traveler=user.id)
 
-        if travel.now_exhibit:
+    try:
+
+        travel = Journey.objects.get(traveler=user.id)
+        count_exhibit_on_rout = Route.objects.get(title=travel.route.title).exhibit.count()
+
+        if travel.now_exhibit <= count_exhibit_on_rout:
             ReflectionExhibit(
                 exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
                 author=user.username,
                 contact=user.id,
                 text=message.text,
                 rating=1
+            ).save()
+            ExhibitComment(
+                text=message.text,
+                user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
+                exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
+                route=travel.route
+            ).save()
+        elif travel.now_exhibit > count_exhibit_on_rout:
+            RouteReview(
+                text=message.text,
+                user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
+                route=travel.route
             ).save()
 
         # ответ на рефлексию
@@ -215,9 +223,11 @@ async def processing_free_content(message: Message):
 
     except ObjectDoesNotExist:
         print("Объект не сушествует")
+        await start_bot(message)
         return None
     except MultipleObjectsReturned:
         print("Найдено более одного объекта")
+        await start_bot(message)
         return None
 
     await message.answer(text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION)-1)])
@@ -230,21 +240,52 @@ async def set_rating_exhibit(message: Message):
     user = message.from_user
     try:
         num = int(message.text)
-        print(num)
         travel = Journey.objects.get(traveler=user.id)
-        refl = list(ReflectionExhibit.objects.filter(
-            exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
-            author=user.username,
-            contact=user.id))[-1]
-        print(refl)
-        refl.rating = num
-        refl.save()
+        count_exhibit_on_rout = Route.objects.get(title=travel.route.title).exhibit.count()
+        if travel.now_exhibit > count_exhibit_on_rout:
+            review_rout = list(RouteReview.objects.filter(
+                user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
+                route=travel.route
+            ))[-1]
+            review_rout.rating_route = num
+            review_rout.save()
+            return None
+        else:
+            refl = list(ReflectionExhibit.objects.filter(
+                exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
+                author=user.username,
+                contact=user.id))[-1]
+
+            comment = list(ExhibitComment.objects.filter(
+                user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
+                exhibit=list(Exhibit.objects.filter(route=travel.route, order=travel.now_exhibit))[-1],
+                route=travel.route))[-1]
+            refl.rating = num
+            comment.rating = num
+            comment.save()
+            refl.save()
+            if travel.now_exhibit == count_exhibit_on_rout:
+                travel.now_exhibit += 1
+
         if 1 <= num < 4:
             await message.answer(text='Это нормально, что вам что-то не понравилось, спасибо за отзыв')
         elif 4 <= num < 7:
             await message.answer(text='Приятно видеть от вас такую оценку')
         else:
             await message.answer(text='Большое спасибо! Мы передадим вашу оценку автору :)')
+
+        if travel.now_exhibit > count_exhibit_on_rout:
+            travel.delete()
+            await message.answer(
+                END_OF_WAY
+            )
+
+            # ссылка на форму обратной связи
+            await message.answer(
+                END_WAY_MESSAGE,
+                reply_markup=keyboard_menu
+            )
+            return None
 
         await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
 
