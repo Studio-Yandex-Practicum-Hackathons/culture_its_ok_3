@@ -73,11 +73,18 @@ async def go_next_exhibit(message: Message):
 
     tr = Journey.objects.get(traveler=chat_id)
     count_exhibit_on_rout = Route.objects.get(title=tr.route.title).exhibit.count()
+    print(count_exhibit_on_rout)
+    print(tr.now_exhibit)
     if tr.now_exhibit < count_exhibit_on_rout:
         ex = Exhibit.objects.get(route__title=tr.route, order=tr.now_exhibit + 1)
 
         tr.now_exhibit = tr.now_exhibit + 1
         tr.save()
+
+        await message.answer(text=ex.name)
+        await message.answer(text=f'Художник {ex.name}')
+        await message.answer(text=ex.address)
+        await message.answer(text=f'как пройти:\n{ex.where_start}')
 
         for i in ex.description_exhibit.all():
             await message.answer(text=i.text)
@@ -217,9 +224,9 @@ async def processing_free_content(message: Message):
             ).save()
 
         # ответ на рефлексию
-        await message.answer(
-            text=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection
-        )
+        answer = Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection or None
+        if answer:
+            await message.answer(text=answer)
 
     except ObjectDoesNotExist:
         print('Объект не сушествует')

@@ -93,7 +93,7 @@ class Exhibit(models.Model):
         null=True
     )
 
-    order = models.PositiveIntegerField(default=1)
+    order = models.PositiveIntegerField(default=0,)
 
     def save(self):
         order = Route.objects.get(title=self.route.title).exhibit.count()
