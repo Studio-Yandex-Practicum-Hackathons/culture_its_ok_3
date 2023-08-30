@@ -29,14 +29,17 @@ keyboard_yes_no = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-keyboard_go_on_or_stop = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text=LET_MOVE_ON[randint(0, len(LET_MOVE_ON)-1)], )],
-        [KeyboardButton(text='Завершить медитацию'), ],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
+
+def keyboard_go_on_or_stop():
+    but = LET_MOVE_ON[randint(0, len(LET_MOVE_ON)-1)]
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=but, )],
+            [KeyboardButton(text='Завершить медитацию'), ],
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
 
 keyboard_yes_or_stop = ReplyKeyboardMarkup(
     keyboard=[
@@ -70,14 +73,16 @@ keyboard_rating = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-keyboard_ready = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='Я готов',), ],
-        [KeyboardButton(text=SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)])]
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
+def keyboard_ready():
+    but = SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)]
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text='Я готов',), ],
+            [KeyboardButton(text=but)]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
 
 keyboard_only_ready = ReplyKeyboardMarkup(
     keyboard=[

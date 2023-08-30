@@ -86,7 +86,7 @@ async def go_next_exhibit(message: Message):
         tr.save()
 
         await message.answer(text=ex.name)
-        await message.answer(text=f'Художник {ex.name}')
+        await message.answer(text=f'Художник {ex.author}')
         await message.answer(text=ex.address)
         await message.answer(text=f'как пройти:\n{ex.where_start}')
 
@@ -193,7 +193,7 @@ async def route_selection(message: Message):
     await message.answer(route.where_start)
 
     # 'Вы на месте?'
-    await message.answer(START_WAY_QUESTION, reply_markup=keyboard_ready)
+    await message.answer(START_WAY_QUESTION, reply_markup=keyboard_ready())
 
     return None
 
@@ -301,7 +301,7 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
             await state.set_state(Cult_cuestions.review_text)
             return None
 
-        await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
+        await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop())
 
     except ObjectDoesNotExist:
         print('Объект не сушествует')
