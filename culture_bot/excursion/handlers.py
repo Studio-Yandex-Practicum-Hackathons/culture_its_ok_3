@@ -222,11 +222,11 @@ async def processing_free_content(message: Message):
         )
 
     except ObjectDoesNotExist:
-        print("Объект не сушествует")
+        print('Объект не сушествует')
         await start_bot(message)
         return None
     except MultipleObjectsReturned:
-        print("Найдено более одного объекта")
+        print('Найдено более одного объекта')
         await start_bot(message)
         return None
 
@@ -290,10 +290,10 @@ async def set_rating_exhibit(message: Message):
         await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
 
     except ObjectDoesNotExist:
-        print("Объект не сушествует")
+        print('Объект не сушествует')
         return None
     except MultipleObjectsReturned:
-        print("Найдено более одного объекта")
+        print('Найдено более одного объекта')
         return None
 
 

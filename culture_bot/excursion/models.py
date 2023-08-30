@@ -6,40 +6,40 @@ from django.db.models import Avg
 class Route(models.Model):
     title = models.CharField(
         max_length=50,
-        verbose_name="Название маршрута",
+        verbose_name='Название маршрута',
     )
     description = models.TextField(
-        verbose_name="Описание маршрута",
+        verbose_name='Описание маршрута',
     )
     lyrics = models.TextField(
-        verbose_name="Лирическое описание",
+        verbose_name='Лирическое описание',
         default='',
     )
     route_map = models.ImageField(
         upload_to='excursion/router_map/',
         blank=True,
-        verbose_name="Карта маршрута",
-        help_text="Добавьте карту маршрута",
+        verbose_name='Карта маршрута',
+        help_text='Добавьте карту маршрута',
     )
 
     cover = models.ImageField(
         upload_to='excursion/cover/',
         blank=True,
-        verbose_name="Обложка маршрута",
-        help_text="Добавьте обложку маршрута",
+        verbose_name='Обложка маршрута',
+        help_text='Добавьте обложку маршрута',
     )
 
     # rating = models.IntegerField(
-    #     verbose_name="Рейтинг",
+    #     verbose_name='Рейтинг',
     #     default=0,
     # )
     where_start = models.TextField(
-        verbose_name="Как пройти к старту",
+        verbose_name='Как пройти к старту',
     )
 
     class Meta:
-        verbose_name = "Маршрут"
-        verbose_name_plural = "Маршруты"
+        verbose_name = 'Маршрут'
+        verbose_name_plural = 'Маршруты'
 
     # def get_rating(self):
     #     return ReflectionExhibit.objects.filter(exhibit=self).aggregate(
@@ -54,41 +54,41 @@ class Exhibit(models.Model):
         Route,
         null=True,
         on_delete=models.SET_NULL,
-        related_name="exhibit",
-        verbose_name="Маршрут",
+        related_name='exhibit',
+        verbose_name='Маршрут',
     )
     name = models.CharField(
         max_length=200,
-        verbose_name="Название экспоната",
+        verbose_name='Название экспоната',
     )
     address = models.CharField(
         max_length=200,
-        verbose_name="Адрес",
+        verbose_name='Адрес',
     )
     # rating = models.IntegerField(
-    #     verbose_name="Рейтинг",
+    #     verbose_name='Рейтинг',
     #     default=1
     # )
 
     author = models.CharField(
         max_length=50,
-        verbose_name="Художник",
+        verbose_name='Художник',
     )
 
     question_for_reflection = models.TextField(
-        verbose_name="Вопрос для рефлексии",
+        verbose_name='Вопрос для рефлексии',
         null=True,
         blank=True,
     )
 
     answer_for_reflection = models.TextField(
-        verbose_name="Ответ для рефлексии",
+        verbose_name='Ответ для рефлексии',
         null=True,
         blank=True,
     )
 
     where_start = models.TextField(
-        verbose_name="Как пройти к экспонату",
+        verbose_name='Как пройти к экспонату',
         blank=True,
         null=True
     )
@@ -101,8 +101,8 @@ class Exhibit(models.Model):
         super(Exhibit, self).save()
 
     class Meta:
-        verbose_name = "Экспонат"
-        verbose_name_plural = "Экспонаты"
+        verbose_name = 'Экспонат'
+        verbose_name_plural = 'Экспонаты'
 
         models.UniqueConstraint(
             fields=('route', 'order'),
@@ -132,8 +132,8 @@ class PhotoExhibit(models.Model):
     photo = models.ImageField(
         upload_to='excursion/exhibit/',
         blank=True,
-        verbose_name="Фотографии экспонатов",
-        help_text="Добавьте картинку экспоната",
+        verbose_name='Фотографии экспонатов',
+        help_text='Добавьте картинку экспоната',
     )
 
 
@@ -179,12 +179,12 @@ class VideoExhibit(models.Model):
 class ReflectionExhibit(models.Model):
     author = models.CharField(
         max_length=20,
-        verbose_name="Комментатор",
+        verbose_name='Комментатор',
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Дата публикации",
+        verbose_name='Дата публикации',
     )
     contact = models.CharField(
         max_length=50
@@ -192,8 +192,8 @@ class ReflectionExhibit(models.Model):
     exhibit = models.ForeignKey(
         Exhibit,
         on_delete=models.CASCADE,
-        related_name="reflection_exhibit",
-        verbose_name="Рефлексия на экспонат",
+        related_name='reflection_exhibit',
+        verbose_name='Рефлексия на экспонат',
     )
     rating = models.IntegerField(
         null=True,
@@ -203,8 +203,8 @@ class ReflectionExhibit(models.Model):
     )
 
     class Meta:
-        verbose_name = "Рефлексия на экспонат"
-        verbose_name_plural = "Рефлексия  на экспонаты"
+        verbose_name = 'Рефлексия на экспонат'
+        verbose_name_plural = 'Рефлексия  на экспонаты'
 
     def __str__(self):
         return self.text[1:20]

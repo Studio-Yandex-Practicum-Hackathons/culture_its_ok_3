@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (ExhibitComment, UserFeedback, RouteReview)
+from .models import ExhibitComment, RouteReview, UserFeedback
 
 
 @admin.register(UserFeedback)

@@ -6,16 +6,17 @@ from .models import Exhibit, ReflectionExhibit, Route
 class ExhibitForm(forms.ModelForm):
     class Meta:
         model = Exhibit
-        fields = ("name", "description", "address")
+        fields = ('name', 'description', 'address')
+        exclude = ('order',)
 
 
 class RouteForm(forms.ModelForm):
     class Meta:
         model = Route
-        fields = ("title", "description", "route_map")
+        fields = ('title', 'description', 'route_map')
 
 
 class ReviewOnExhibitForm(forms.ModelForm):
     class Meta:
         model = ReflectionExhibit
-        fields = ("author", "text", "exhibit")
+        fields = ('author', 'text', 'exhibit')

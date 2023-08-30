@@ -23,11 +23,11 @@ class DescriptionExhibitTabularInline(admin.TabularInline):
 @admin.register(Route)
 class RouteAdmin(admin.ModelAdmin):
     list_display = (
-        "title",
-        "description",
+        'title',
+        'description',
     )
-    search_fields = ("description", "title")
-    empty_value_display = "-пусто-"
+    search_fields = ('description', 'title')
+    empty_value_display = '-пусто-'
 
 
 @admin.register(Exhibit)
@@ -35,15 +35,15 @@ class ExhibitAdmin(admin.ModelAdmin):
     inlines = [PhotoExhibitTabularInline, AudioExhibitTabularInline,
                VideoExhibitTabularInline, DescriptionExhibitTabularInline]
     list_display = (
-        "name",
-        "address",
-        "author",
-        "route"
+        'name',
+        'address',
+        'author',
+        'route'
     )
     # inlines = (ExhibitRetingInline,)
-    list_filter = ("name", )
-    empty_value_display = "-пусто-"
-    list_editable = ("route",)
+    list_filter = ('name', )
+    empty_value_display = '-пусто-'
+    list_editable = ('route',)
 
 
 
@@ -51,14 +51,14 @@ class ExhibitAdmin(admin.ModelAdmin):
 @admin.register(ReflectionExhibit)
 class ReflectionExhibitAdmin(admin.ModelAdmin):
     list_display = (
-        "text",
-        "exhibit",
-        "author",
-        "contact",
+        'text',
+        'exhibit',
+        'author',
+        'contact',
     )
-    search_fields = ("text", "exhibit",)
-    list_filter = ("author", "exhibit")
-    empty_value_display = "-пусто-"
+    search_fields = ('text', 'exhibit',)
+    list_filter = ('author', 'exhibit')
+    empty_value_display = '-пусто-'
 
 
 @admin.register(Journey)

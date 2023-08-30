@@ -1,10 +1,10 @@
+from random import randint
+
 from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
                            KeyboardButton, ReplyKeyboardMarkup)
 
-from .models import Route
-
-from random import randint
 from .messages import *
+from .models import Route
 
 routs = Route.objects.all()
 
