@@ -63,8 +63,10 @@ def get_data_from_db(
                 exhibit=exhibit.id
             )
             exhibit_data = []
+            route_id = None
             for comment in exhibit_comments:
                 route_name = comment.exhibit.route.title
+                route_id = comment.exhibit.route.id
                 user_feedback = UserFeedback.objects.get(
                     id=comment.user_feedback_id
                 )
@@ -75,5 +77,7 @@ def get_data_from_db(
                     "Comment": comment.text,
                     "Data": comment.timestamp.strftime('%Y-%m-%d %H:%M:%S')
                 })
-            data['for_exhibits_report'][exhibit.name] = exhibit_data
+            data['for_exhibits_report'][
+                f'{exhibit.name}-{route_id}-{exhibit.order}'
+            ] = exhibit_data
     return data

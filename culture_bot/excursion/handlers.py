@@ -381,3 +381,4 @@ async def after_get_route_rating(message: Message, state: FSMContext):
         reply_markup=keyboard_menu
     )
     travel.delete()
+    await state.clear()
