@@ -3,9 +3,11 @@ import sys
 
 from aiogram import F, Router
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import FSInputFile, Message
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.utils import timezone
 from dotenv import load_dotenv
 
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
@@ -24,6 +26,8 @@ router = Router()
 class Cult_cuestions(StatesGroup):
     question_1 = State()
     raiting = State()
+    review_text = State()
+    route_rating = State()
 
 
 @router.message(Command('start'))
@@ -243,7 +247,7 @@ async def processing_free_content(message: Message):
     return None
 
 
-async def set_rating_exhibit(message: Message):
+async def set_rating_exhibit(message: Message, state: FSMContext):
     user = message.from_user
     try:
         num = int(message.text)
@@ -268,7 +272,7 @@ async def set_rating_exhibit(message: Message):
                 exhibit=list(Exhibit.objects.filter(route=travel.route, order=travel.now_exhibit))[-1],
                 route=travel.route))[-1]
             refl.rating = num
-            comment.rating = num
+            comment.rating_exhibit = num
             comment.save()
             refl.save()
             if travel.now_exhibit == count_exhibit_on_rout:
@@ -282,16 +286,19 @@ async def set_rating_exhibit(message: Message):
             await message.answer(text='Большое спасибо! Мы передадим вашу оценку автору :)')
 
         if travel.now_exhibit > count_exhibit_on_rout:
-            travel.delete()
             await message.answer(
                 END_OF_WAY
             )
 
             # ссылка на форму обратной связи
-            await message.answer(
-                END_WAY_MESSAGE,
-                reply_markup=keyboard_menu
-            )
+            # await message.answer(
+            #     END_WAY_MESSAGE,
+            #     reply_markup=keyboard_menu
+            # )
+
+            # другая концовка с вводом отзыва и рейтинга
+            await message.answer(END_WAY_MESSAGE_2)
+            await state.set_state(Cult_cuestions.review_text)
             return None
 
         await message.answer(GREAT, reply_markup=keyboard_go_on_or_stop)
@@ -305,15 +312,22 @@ async def set_rating_exhibit(message: Message):
 
 
 @router.message(F.text)
-async def handle_message(message: Message):
+async def handle_message(message: Message, state: FSMContext):
+    current_state = await state.get_state()
     routs_all = [rout.title for rout in Route.objects.all()]
     message_text = message.text
-    if message_text in routs_all:
+    if current_state == Cult_cuestions.review_text:
+        await after_get_review_message(message, state)
+        return None
+    elif current_state == Cult_cuestions.route_rating:
+        await after_get_route_rating(message, state)
+        return None
+    elif message_text in routs_all:
         await route_selection(message)
         return None
 
     elif message_text.isdigit():
-        await set_rating_exhibit(message)
+        await set_rating_exhibit(message, state)
         return None
 
     elif message_text in SEARCH_FOR_PLACE:
@@ -327,3 +341,43 @@ async def handle_message(message: Message):
     else:
         await processing_free_content(message)
         return None
+
+
+@router.message(Cult_cuestions.review_text)
+async def after_get_review_message(message: Message, state: FSMContext):
+    if message.text:
+        await state.update_data(review_text=message.text)
+    await state.set_state(Cult_cuestions.route_rating)
+    await message.answer(REVIEW_THANKS)
+    await message.answer(
+        RAITING_REVIEW,
+        reply_markup=keyboard_rating
+    )
+    await state.set_state(Cult_cuestions.route_rating)
+
+
+@router.message(Cult_cuestions.route_rating)
+async def after_get_route_rating(message: Message, state: FSMContext):
+    current_time = timezone.now()
+    user = message.from_user
+    travel = Journey.objects.get(traveler=user.id)
+    data = await state.get_data()
+    review_text = data.get('review_text', '')
+    RouteReview(
+        text=review_text,
+        user_feedback=list(UserFeedback.objects.filter(
+            telegram_id=user.id, route=travel.route
+        ))[-1],
+        route=travel.route,
+        rating_route=int(message.text)
+    ).save()
+    user_feedback=list(UserFeedback.objects.filter(
+        telegram_id=user.id, route=travel.route
+    ))[-1]
+    user_feedback.end_time_route = current_time
+    user_feedback.save()
+    await message.answer(
+        RAITING_THANKS,
+        reply_markup=keyboard_menu
+    )
+    travel.delete()
