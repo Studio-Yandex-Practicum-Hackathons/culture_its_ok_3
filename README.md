@@ -70,14 +70,35 @@ DB_PORT=
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/7b6cbfa6-88c2-4e66-8d77-564e87f7f86d)
 2) /start и все. На этом моменте бот уже будет работать
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/fc828494-7261-48e9-9a8a-9d8c9ea28788)
-3) Копируем и вставляем во вторую константу TELEGRAM_CHAT_ID
+3) Копируем и вставляем во вторую константу TELEGRAM_CHAT_ID. И можем тестить функционал бота
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/d03c6a38-0748-424f-9ba8-cb1d69518b9c)
 
 ### Как узнать бок данных от Google? Ну ладно, только никому🤫🤫🤫
 
 Блок данных от гугла тоже должен быть в строгой секретности, иначе все узнают что и кто написал об экспонате.
 
-1) 
+1) Если вы бестрашный воин, то преходите по этой [сслыке](https://console.cloud.google.com/projectselector2/home/dashboard)
+2) Дальше все как во всех боевиках. Создаем проект, заходим во вкладку API and Servises. Создаем Google Sheets.
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/327316c8-0ec3-4311-878c-73fd9c1e330c)
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/e6e40a8f-0af1-4b06-9187-be8301669108)
+3) Дальше как в квесте. По подскаскам расгадываем ребус
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/f4675e84-15b7-4fe3-b433-58265e0aaf49)
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/cf80d99a-05b3-46b2-8994-5d3aff035a15)
+4) Эта форма состоит из трёх полей:
+- Service account name — имя аккаунта, может быть любым;
+- Service account ID — ID, формируется автоматически из имени аккаунта;
+- Service account description — описание сервисного аккаунта; тут можно написать, за что будет отвечать этот сервисный аккаунт.
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/dbeddea5-5872-4ae3-9a56-a2b45630b119)
+5) Где будет выбор роли - ставим Basic
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/7ceedd4b-4fa6-4a35-af2a-2f977a5a83a6)
+6) Должно выйтим что-то в этом духе
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/cf8461f1-c756-4c48-aa43-0925d2846cec)
+
+
+
+
+
+
 
 
 
