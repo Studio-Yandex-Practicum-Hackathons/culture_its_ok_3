@@ -2,7 +2,7 @@ from random import randint
 
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from .messages import *
+from .messages import LET_MOVE_ON, SEARCH_FOR_PLACE
 from .models import Route
 
 routs = Route.objects.all()
@@ -22,16 +22,6 @@ def keyboard_ways():
     )
 
 
-keyboard_yes_no = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='/yes'), ],
-        [KeyboardButton(text='/no'), ],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
-
-
 def keyboard_go_on_or_stop():
     but = LET_MOVE_ON[randint(0, len(LET_MOVE_ON)-1)]
     return ReplyKeyboardMarkup(
@@ -44,14 +34,17 @@ def keyboard_go_on_or_stop():
     )
 
 
-keyboard_yes_or_stop = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='/yes'), ],
-        [KeyboardButton(text='/end'), ],
-    ],
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
+def keyboard_ready():
+    but = SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)]
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text='Я готов',), ],
+            [KeyboardButton(text=but)]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
 
 keyboard_menu = ReplyKeyboardMarkup(
     keyboard=[
@@ -75,18 +68,6 @@ keyboard_rating = ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=True
 )
-
-
-def keyboard_ready():
-    but = SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)]
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text='Я готов',), ],
-            [KeyboardButton(text=but)]
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True
-    )
 
 
 keyboard_only_ready = ReplyKeyboardMarkup(

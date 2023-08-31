@@ -1,6 +1,5 @@
 import asyncio
 import os
-import sys
 
 from aiogram import F, Router
 from aiogram.filters import Command
@@ -13,7 +12,7 @@ from dotenv import load_dotenv
 
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
 
-from .const import DIVISION_COEFFICIENT
+from .const import DELAY_CONSTANT, DIVISION_COEFFICIENT
 from .custom_keyboard import *
 from .messages import *
 from .models import Exhibit, Journey, ReflectionExhibit, Route
@@ -25,30 +24,30 @@ dirname = os.path.dirname(__file__)
 router = Router()
 
 
-async def create_dilay(text):
-    await asyncio.sleep(len(text)//DIVISION_COEFFICIENT)
-
-
-async def message_answer(message: Message, text, **kwargs):
-    if '<HTML>' in text:
-        text = text.replace('<HTML>', '')
-        await message.answer(text, parse_mode="HTML", **kwargs)
-        await create_dilay(text)
-        return None
-    elif '<MarkdownV2>' in text:
-        text = text.replace('<MarkdownV2>', '')
-        await message.answer(text, parse_mode="MarkdownV2", **kwargs)
-        await create_dilay(text)
-        return None
-    await message.answer(text, **kwargs)
-    await create_dilay(text)
-
-
 class CultCuestions(StatesGroup):
     question_1 = State()
     raiting = State()
     review_text = State()
     route_rating = State()
+
+
+async def create_dilay(text):
+    await asyncio.sleep(len(text)//DIVISION_COEFFICIENT + DELAY_CONSTANT )
+
+
+async def message_answer(message: Message, text, **kwargs):
+    if '<HTML>' in text:
+        text = text.replace('<HTML>', '')
+        await message.answer(text, parse_mode='HTML', **kwargs)
+        await create_dilay(text)
+        return None
+    elif '<MarkdownV2>' in text:
+        text = text.replace('<MarkdownV2>', '')
+        await message.answer(text, parse_mode='MarkdownV2', **kwargs)
+        await create_dilay(text)
+        return None
+    await message.answer(text, **kwargs)
+    await create_dilay(text)
 
 
 @router.message(Command('start'))
@@ -77,98 +76,6 @@ async def start_bot(message: Message):
         CHOISE_YOUR_WAY,
         reply_markup=keyboard_ways(),
     )
-
-
-@router.message(F.text == 'Завершить медитацию')
-@router.message(Command('end'))
-async def stop_journey(message: Message):
-    Journey.objects.get(traveler=message.from_user.id).delete()
-    await message_answer(message,
-                         STOP_JOURNY,)
-
-
-@router.message(F.text == 'О проекте')
-async def about(message: Message):
-    await message_answer(message,
-                         ABOUT,
-                         reply_markup=keyboard_menu)
-
-
-@router.message(F.text == 'Что ты умеешь?')
-async def what_i_an_do(message: Message):
-    await message_answer(message,
-                         WHAT_I_CAN_DO,
-                         reply_markup=keyboard_menu)
-
-
-@router.message(F.text == 'Я готов')
-@router.message(Command('next'))
-async def go_next_exhibit(message: Message):
-    chat_id = message.from_user.id
-
-    tr = Journey.objects.get(traveler=chat_id)
-    count_exhibit_on_rout = Route.objects.get(title=tr.route.title).exhibit.count()
-    print(count_exhibit_on_rout)
-    print(tr.now_exhibit)
-    if tr.now_exhibit < count_exhibit_on_rout:
-        ex = Exhibit.objects.get(route__title=tr.route, order=tr.now_exhibit + 1)
-
-        tr.now_exhibit = tr.now_exhibit + 1
-        tr.save()
-
-        await message_answer(message, text=ex.name,)
-        await message_answer(message, text=f'Художник {ex.author}', )
-        await message_answer(message, text=ex.address, )
-        await message_answer(message, text=f'как пройти:\n{ex.where_start}', )
-
-        for i in ex.description_exhibit.all():
-            await message_answer(message, text=i.text)
-
-        # отправка нескольких фоток
-        try:
-            if ex.photo_exhibit.count() > 0:
-                for i in ex.photo_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
-                    image_from_pc = FSInputFile(path)
-                    caption = i.description if i.description else ''
-                    await message.answer_photo(
-                        image_from_pc,
-                        caption=caption
-                    )
-        except Exception as e:
-            print(f'проблем {e}')
-
-        # отправка аудио
-        try:
-            if ex.audio_exhibit.count() > 0:
-                for i in ex.audio_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
-                    audio_from_pc = FSInputFile(path)
-                    await message.answer_audio(
-                        audio_from_pc,
-                    )
-        except Exception:
-            pass
-
-        # отправка видео
-        try:
-            if ex.video_exhibit.count() > 0:
-                for i in ex.video_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
-                    video_from_pc = FSInputFile(path)
-                    await message.answer_audio(
-                        video_from_pc,
-                    )
-        except Exception:
-            pass
-
-        question_for_reflection = ex.question_for_reflection or None
-        if question_for_reflection:
-            await message_answer(message, text=question_for_reflection,)
-
-    elif tr.now_exhibit == count_exhibit_on_rout:
-        tr.now_exhibit = tr.now_exhibit + 1
-        await processing_free_content(message)
 
 
 # если находимся не рядом с местом медитации
@@ -352,6 +259,99 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
 
 async def route_being_updated(message: Message):
     await message_answer(message, SORRY_CLOSED_ROUTE, reply_markup=keyboard_ways())
+
+
+@router.message(F.text == 'Завершить медитацию')
+@router.message(Command('end'))
+async def stop_journey(message: Message):
+    Journey.objects.get(traveler=message.from_user.id).delete()
+    await message_answer(message,
+                         STOP_JOURNY,)
+
+
+@router.message(F.text == 'О проекте')
+async def about(message: Message):
+    await message_answer(message,
+                         ABOUT,
+                         reply_markup=keyboard_menu)
+
+
+@router.message(F.text == 'Что ты умеешь?')
+async def what_i_an_do(message: Message):
+    await message_answer(message,
+                         WHAT_I_CAN_DO,
+                         reply_markup=keyboard_menu)
+
+
+@router.message(F.text == 'Я готов')
+@router.message(Command('next'))
+async def go_next_exhibit(message: Message):
+    chat_id = message.from_user.id
+
+    tr = Journey.objects.get(traveler=chat_id)
+    count_exhibit_on_rout = Route.objects.get(title=tr.route.title).exhibit.count()
+    if tr.now_exhibit < count_exhibit_on_rout:
+        ex = Exhibit.objects.get(route__title=tr.route, order=tr.now_exhibit + 1)
+
+        tr.now_exhibit = tr.now_exhibit + 1
+        tr.save()
+
+        await message_answer(message, text=ex.name,)
+        await message_answer(message, text=f'Художник {ex.author}', )
+        await message_answer(message, text=ex.address, )
+        await message_answer(message, text=f'как пройти:\n{ex.where_start}', )
+
+        for i in ex.description_exhibit.all():
+            await message_answer(message, text=i.text)
+
+        # отправка нескольких фоток
+        try:
+            if ex.photo_exhibit.count() > 0:
+                for i in ex.photo_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    image_from_pc = FSInputFile(path)
+                    caption = i.description if i.description else ''
+                    await message.answer_photo(
+                        image_from_pc,
+                        caption=caption
+                    )
+        except Exception as e:
+            print(f'photo_exhibit: {e}')
+            await message_answer(message, OOPS_ERROR)
+
+        # отправка аудио
+        try:
+            if ex.audio_exhibit.count() > 0:
+                for i in ex.audio_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    audio_from_pc = FSInputFile(path)
+                    await message.answer_audio(
+                        audio_from_pc,
+                    )
+        except Exception as e:
+            print(f'audio_exhibit: {e}')
+            await message_answer(message, OOPS_ERROR)
+
+        # отправка видео
+        try:
+            if ex.video_exhibit.count() > 0:
+                for i in ex.video_exhibit.all():
+                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    video_from_pc = FSInputFile(path)
+                    await message.answer_audio(
+                        video_from_pc,
+                    )
+        except Exception as e:
+            print(f'video_exhibit: {e}')
+            await message_answer(message, OOPS_ERROR)
+
+        question_for_reflection = ex.question_for_reflection or None
+        if question_for_reflection:
+            await message_answer(message, text=question_for_reflection,)
+
+    elif tr.now_exhibit == count_exhibit_on_rout:
+        tr.now_exhibit = tr.now_exhibit + 1
+        await processing_free_content(message)
 
 
 @router.message(F.text)
