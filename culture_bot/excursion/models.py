@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from .validators import file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator
 
 
 class Route(models.Model):
@@ -19,6 +20,7 @@ class Route(models.Model):
         blank=True,
         verbose_name='Карта маршрута',
         help_text='Добавьте карту маршрута',
+        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
     )
 
     cover = models.ImageField(
@@ -26,6 +28,7 @@ class Route(models.Model):
         blank=True,
         verbose_name='Обложка маршрута',
         help_text='Добавьте обложку маршрута',
+        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
     )
 
     where_start = models.TextField(
@@ -129,6 +132,7 @@ class PhotoExhibit(models.Model):
         blank=True,
         verbose_name='Фотографии экспонатов',
         help_text='Добавьте картинку экспоната',
+        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
     )
 
 
@@ -145,7 +149,8 @@ class AudioExhibit(models.Model):
     exhibit = models.ForeignKey(
         Exhibit,
         on_delete=models.CASCADE,
-        related_name='audio_exhibit'
+        related_name='audio_exhibit',
+        validators=[file_size_validator]
     )
     description = models.CharField(
         max_length=200,
@@ -160,7 +165,8 @@ class VideoExhibit(models.Model):
     exhibit = models.ForeignKey(
         Exhibit,
         on_delete=models.CASCADE,
-        related_name='video_exhibit'
+        related_name='video_exhibit',
+        validators=[file_size_validator]
     )
     description = models.CharField(
         max_length=200,
