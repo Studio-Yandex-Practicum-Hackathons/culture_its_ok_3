@@ -123,8 +123,15 @@ DB_PORT=
 Как быть с тем что осталось? Не буду вас мучать. Копируйте и выдыхайте
 
 ```
-
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
 ```
+
+### Бот к запуску готов. Осталось вставить ключь зажигание и вперед!
 
 
 
