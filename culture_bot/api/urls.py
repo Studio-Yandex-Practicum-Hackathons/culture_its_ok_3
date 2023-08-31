@@ -3,7 +3,6 @@ from rest_framework.routers import DefaultRouter
 
 from api.views import CreateGoogleGeneralReportViewSet
 
-
 router = DefaultRouter()
 router.register(
     r'create-google-report',

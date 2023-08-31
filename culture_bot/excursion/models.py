@@ -96,8 +96,9 @@ class Exhibit(models.Model):
     order = models.PositiveIntegerField(default=0,)
 
     def save(self):
-        order = Route.objects.get(title=self.route.title).exhibit.count()
-        self.order = order + 1
+        if self.pk is None:
+            order = Route.objects.get(title=self.route.title).exhibit.count()
+            self.order = order + 1
         super(Exhibit, self).save()
 
     class Meta:

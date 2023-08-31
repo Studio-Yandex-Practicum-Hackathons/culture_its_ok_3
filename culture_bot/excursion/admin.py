@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
                      PhotoExhibit, ReflectionExhibit, Route, VideoExhibit)
 
-from .forms import ExhibitForm
+
 class PhotoExhibitTabularInline(admin.TabularInline):
     model = PhotoExhibit
 
@@ -41,12 +41,9 @@ class ExhibitAdmin(admin.ModelAdmin):
         'route',
         'order'
     )
-    # inlines = (ExhibitRetingInline,)
     list_filter = ('name', )
     empty_value_display = '-пусто-'
     list_editable = ('route',)
-    form = ExhibitForm
-
 
 
 @admin.register(ReflectionExhibit)
