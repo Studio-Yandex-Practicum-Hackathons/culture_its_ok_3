@@ -1,4 +1,4 @@
 MAX_SIZE_FILE = 10*1024*1024  # максимальный размер файла 10 мегабайт
-MAX_LINEAR_SIZE = 10000
-MAX_PROPORTIONS = 20
-DIVISION_COEFFICIENT = 100
+MAX_LINEAR_SIZE = 10000  # максимальная сумма линейных размеров фотографии
+MAX_PROPORTIONS = 20  # максимальные пропорции изображения
+DIVISION_COEFFICIENT = 100  # коэффициент деления для задержки между сообщениями

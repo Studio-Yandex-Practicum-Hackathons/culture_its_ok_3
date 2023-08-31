@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from .validators import file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator
+
+from .validators import (aspect_ratio_validator, file_size_validator,
+                         linear_image_dimensions_validator)
 
 
 class Route(models.Model):
@@ -219,3 +221,7 @@ class Journey(models.Model):
         null=True
     )
     now_exhibit = models.PositiveIntegerField()
+
+    class Meta:
+        verbose_name = 'Начатое путешествие'
+        verbose_name_plural = 'Начатые путешествия'

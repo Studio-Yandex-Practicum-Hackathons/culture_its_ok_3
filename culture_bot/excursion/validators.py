@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
-from .const import *
+
+from .const import MAX_LINEAR_SIZE, MAX_PROPORTIONS, MAX_SIZE_FILE
 
 
 def file_size_validator(value):

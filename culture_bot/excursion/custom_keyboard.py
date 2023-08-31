@@ -1,7 +1,6 @@
 from random import randint
 
-from aiogram.types import (InlineKeyboardButton, InlineKeyboardMarkup,
-                           KeyboardButton, ReplyKeyboardMarkup)
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from .messages import *
 from .models import Route
@@ -44,6 +43,7 @@ def keyboard_go_on_or_stop():
         one_time_keyboard=True
     )
 
+
 keyboard_yes_or_stop = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text='/yes'), ],
@@ -76,6 +76,7 @@ keyboard_rating = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
+
 def keyboard_ready():
     but = SEARCH_FOR_PLACE[randint(0, len(SEARCH_FOR_PLACE)-1)]
     return ReplyKeyboardMarkup(
@@ -86,6 +87,7 @@ def keyboard_ready():
         resize_keyboard=True,
         one_time_keyboard=True
     )
+
 
 keyboard_only_ready = ReplyKeyboardMarkup(
     keyboard=[

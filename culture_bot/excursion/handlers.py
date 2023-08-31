@@ -1,6 +1,7 @@
+import asyncio
 import os
 import sys
-import asyncio
+
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -10,13 +11,12 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils import timezone
 from dotenv import load_dotenv
 
-
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
 
+from .const import DIVISION_COEFFICIENT
 from .custom_keyboard import *
 from .messages import *
 from .models import Exhibit, Journey, ReflectionExhibit, Route
-from .const import DIVISION_COEFFICIENT
 
 load_dotenv()
 
@@ -42,7 +42,6 @@ async def message_answer(message: Message, text, **kwargs):
         return None
     await message.answer(text, **kwargs)
     await create_dilay(text)
-
 
 
 class CultCuestions(StatesGroup):
@@ -86,6 +85,7 @@ async def stop_journey(message: Message):
     Journey.objects.get(traveler=message.from_user.id).delete()
     await message_answer(message,
                          STOP_JOURNY,)
+
 
 @router.message(F.text == 'О проекте')
 async def about(message: Message):
@@ -147,7 +147,7 @@ async def go_next_exhibit(message: Message):
                     await message.answer_audio(
                         audio_from_pc,
                     )
-        except:
+        except Exception:
             pass
 
         # отправка видео
@@ -159,7 +159,7 @@ async def go_next_exhibit(message: Message):
                     await message.answer_audio(
                         video_from_pc,
                     )
-        except:
+        except Exception:
             pass
 
         question_for_reflection = ex.question_for_reflection or None
