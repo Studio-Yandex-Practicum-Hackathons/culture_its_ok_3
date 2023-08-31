@@ -159,3 +159,4 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-
 sudo docker-compose up -d --build
 ```
 Теперь точно тестим
+Поверили? Не расходимя, еще деплой бота, но это завтра 
