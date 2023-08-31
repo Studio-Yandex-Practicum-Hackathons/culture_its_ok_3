@@ -239,7 +239,7 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
                     question_end,
                     reply_markup=keyboard_menu
                 )
-                travel.delete()
+
 
             # другая концовка с вводом отзыва и рейтинга
             await message_answer(message, END_WAY_MESSAGE_2)
