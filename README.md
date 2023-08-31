@@ -46,6 +46,7 @@ DB_HOST=
 DB_PORT=
 ```
 ### Как узнать токен бота TELEGRAM_TOKEN? Первым делом нужно его создать!
+
 1) Копирукем `@BotFather` и вставляем в поиск 
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/7b6cbfa6-88c2-4e66-8d77-564e87f7f86d)
 2) Запускаем бота и выбираем /newbot
@@ -61,6 +62,20 @@ DB_PORT=
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/1aedd0c6-1a44-4a93-9f70-0e4222f3fd9c)
 5) Закидываем в первую константу env файла и идем разминать спину.
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/a7484b8e-c4d4-423a-b5b6-c6ae67b5b25d)
+
+
+### Как узнать TELEGRAM_CHAT_ID? Этому еще в школе учили...
+
+1) Для любетелей поспать на уроках посвящается. Копируем `@getmyid_bot` и вставялем в поиск
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/7b6cbfa6-88c2-4e66-8d77-564e87f7f86d)
+2) /start и все. На этом моменте бот уже будет работать
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/fc828494-7261-48e9-9a8a-9d8c9ea28788)
+3) Копируем и вставляем во вторую константу TELEGRAM_CHAT_ID
+
+
+
+
+
 
 
 
