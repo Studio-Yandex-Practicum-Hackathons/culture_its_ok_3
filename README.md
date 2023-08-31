@@ -93,11 +93,38 @@ DB_PORT=
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/7ceedd4b-4fa6-4a35-af2a-2f977a5a83a6)
 6) Должно выйтим что-то в этом духе
 ![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/cf8461f1-c756-4c48-aa43-0925d2846cec)
+#### Остался последний рывок
+7) Получаем JSON-файл с ключом доступа к сервисному аккаунту
+   - Осталось получить JSON-файл с ключом доступа к сервисному аккаунту и можно будет отвлечься от интерфейсных дебрей Google Cloude Platform.
+   - Перейдите на экран Credentials, нажмите на строчку с названием вашего сервисного аккаунта, чтобы попасть в его настройки.
+   - Нажмите Keys – Add Key – Create New Key, чтобы создать ключ доступа к вашему сервисному аккаунту.
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/8f03275e-dc7c-43ae-8b6f-569659473ee2)
+![image](https://github.com/Studio-Yandex-Practicum-Hackathons/culture_its_ok_3/assets/108357574/07433e35-bc18-483b-ac4c-caf1ae21c358)
+8) Дело мастера боится. К нам скачивается JSON файл (~~не вирус~~). Если есть редакторы кода (VSCode, Noteapd++, Sublime), то открывате этот файл там, если нет то качаем и открываем. Должно быть что-то типо
 
+```
+{
+  "type": "service_account",
+  "project_id": "fluid-dreamer-343515",
+  "private_key_id": "47169bcc4c4......8a331d4b769eb1ff",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n....bTxwcv\n-----END PRIVATE KEY-----\n",
+  "client_email": "test-praktikum@fluid-dreamer-343515.iam.gserviceaccount.com",
+  "client_id": "114239083367454348646",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/test-praktikum%40fluid-dreamer-343515.iam.gserviceaccount.com"
+} 
+```
+Теперь нам надо вставить это все в ссответсвующие константы БЕЗ СКОБОЧЕК И ПРОЧЕЙ МИШУРЫ
 
+### Как проверить что все хорошо? Пока никак😈😈😈
 
+Как быть с тем что осталось? Не буду вас мучать. Копируйте и выдыхайте
 
+```
 
+```
 
 
 
