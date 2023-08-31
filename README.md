@@ -130,8 +130,38 @@ POSTGRES_PASSWORD=postgres
 DB_HOST=db
 DB_PORT=5432
 ```
+# Если вы делаете все на удаленом сервере
 
 ### Бот к запуску готов. Осталось вставить ключь зажигание и вперед!
+Шутка! Первым делом надо обновить все на ВМ
+Вообще просто вставляйте в строку все что я напишу по порядку.
+```
+sudo apt upgrade -y
+sudo apt install curl
+# Эта команда скачает скрипт для установки докера
+curl -fsSL https://get.docker.com -o get-docker.sh
+# Эта команда запустит его
+sh get-docker.sh
+sudo apt remove docker docker-engine docker.io containerd runc #должно быть E: Unable to locate package docker-engine
+sudo apt update
+sudo apt install \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  gnupg-agent \
+  software-properties-common -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+sudo apt install docker-ce docker-compose -y
+sudo systemctl status docker 
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo docker-compose up -d --build 
+```
+Теперь точно тестим
+
+
+
 
 
 
