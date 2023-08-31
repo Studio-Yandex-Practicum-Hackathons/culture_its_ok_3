@@ -1,6 +1,6 @@
 import os
 import sys
-
+import asyncio
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -10,11 +10,13 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils import timezone
 from dotenv import load_dotenv
 
+
 from google_api.models import ExhibitComment, RouteReview, UserFeedback
 
 from .custom_keyboard import *
 from .messages import *
 from .models import Exhibit, Journey, ReflectionExhibit, Route
+from .const import DIVISION_COEFFICIENT
 
 load_dotenv()
 
@@ -23,17 +25,24 @@ dirname = os.path.dirname(__file__)
 router = Router()
 
 
+async def create_dilay(text):
+    await asyncio.sleep(len(text)//DIVISION_COEFFICIENT)
+
+
 async def message_answer(message: Message, text, **kwargs):
     if '<HTML>' in text:
         text = text.replace('<HTML>', '')
-        print()
         await message.answer(text, parse_mode="HTML", **kwargs)
+        await create_dilay(text)
         return None
     elif '<MarkdownV2>' in text:
         text = text.replace('<MarkdownV2>', '')
         await message.answer(text, parse_mode="MarkdownV2", **kwargs)
+        await create_dilay(text)
         return None
     await message.answer(text, **kwargs)
+    await create_dilay(text)
+
 
 
 class CultCuestions(StatesGroup):
