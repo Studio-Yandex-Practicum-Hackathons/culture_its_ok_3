@@ -8,17 +8,20 @@ from .models import Route
 
 routs = Route.objects.all()
 
-button_ways = [
-    *[[KeyboardButton(text=rout.title)] for rout in routs],
-    [KeyboardButton(text='О проекте')],
-    [KeyboardButton(text='Что ты умеешь?')],
-]
 
-keyboard_ways = ReplyKeyboardMarkup(
-    keyboard=button_ways,
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
+def keyboard_ways():
+    button_ways = [[KeyboardButton(text=rout.title)] for rout in routs if rout.show]
+
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            *button_ways,
+            [KeyboardButton(text='О проекте')],
+            [KeyboardButton(text='Что ты умеешь?')],
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
 
 keyboard_yes_no = ReplyKeyboardMarkup(
     keyboard=[

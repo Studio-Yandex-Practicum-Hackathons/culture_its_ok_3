@@ -1,6 +1,5 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Avg
 
 
 class Route(models.Model):
@@ -29,21 +28,24 @@ class Route(models.Model):
         help_text='Добавьте обложку маршрута',
     )
 
-    # rating = models.IntegerField(
-    #     verbose_name='Рейтинг',
-    #     default=0,
-    # )
     where_start = models.TextField(
         verbose_name='Как пройти к старту',
+    )
+
+    question_end = models.TextField(
+        verbose_name='Вопрос в конце маршрута',
+        blank=True,
+        null=True,
+    )
+
+    show = models.BooleanField(
+        verbose_name='Показывать маршрут?',
+        default=True
     )
 
     class Meta:
         verbose_name = 'Маршрут'
         verbose_name_plural = 'Маршруты'
-
-    # def get_rating(self):
-    #     return ReflectionExhibit.objects.filter(exhibit=self).aggregate(
-    #         Avg('rating'))
 
     def __str__(self):
         return self.title
@@ -65,10 +67,6 @@ class Exhibit(models.Model):
         max_length=200,
         verbose_name='Адрес',
     )
-    # rating = models.IntegerField(
-    #     verbose_name='Рейтинг',
-    #     default=1
-    # )
 
     author = models.CharField(
         max_length=50,
@@ -109,10 +107,6 @@ class Exhibit(models.Model):
             fields=('route', 'order'),
             name='unique_route_for_order'
         ),
-
-    # def get_rating(self):
-    #     return ReflectionExhibit.objects.filter(exhibit=self).aggregate(Avg('rating'))
-    #
 
     def __str__(self):
         return self.name

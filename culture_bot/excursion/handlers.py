@@ -26,6 +26,7 @@ router = Router()
 async def message_answer(message: Message, text, **kwargs):
     if '<HTML>' in text:
         text = text.replace('<HTML>', '')
+        print()
         await message.answer(text, parse_mode="HTML", **kwargs)
         return None
     elif '<MarkdownV2>' in text:
@@ -48,7 +49,7 @@ async def start_bot(message: Message):
     await message_answer(
         message,
         START_MESSAGE,
-        reply_markup=keyboard_ways,
+        reply_markup=keyboard_ways(),
     )
 
     await message_answer(
@@ -66,7 +67,7 @@ async def start_bot(message: Message):
     await message_answer(
         message,
         CHOISE_YOUR_WAY,
-        reply_markup=keyboard_ways,
+        reply_markup=keyboard_ways(),
     )
 
 
@@ -313,13 +314,17 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
                 message,
                 END_OF_WAY
             )
+            question_end = travel.route.question_end
 
-            # ссылка на форму обратной связи
-            # await message_answer(
-            #     message,
-            #     END_WAY_MESSAGE,
-            #     reply_markup=keyboard_menu
-            # )
+            if question_end:
+                # ссылка на форму обратной связи
+                await message_answer(
+                    message,
+                    question_end,
+                    reply_markup=keyboard_menu
+                )
+                travel.delete()
+                return None
 
             # другая концовка с вводом отзыва и рейтинга
             await message_answer(message, END_WAY_MESSAGE_2)
@@ -336,19 +341,31 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
         return None
 
 
+async def route_being_updated(message: Message):
+    await message_answer(message, SORRY_CLOSED_ROUTE, reply_markup=keyboard_ways())
+
+
 @router.message(F.text)
 async def handle_message(message: Message, state: FSMContext):
     current_state = await state.get_state()
-    routs_all = [rout.title for rout in Route.objects.all()]
+    available_routes = [rout.title for rout in Route.objects.all() if rout.show]
+    closed_routes = [rout.title for rout in Route.objects.all() if not rout.show]
     message_text = message.text
+
     if current_state == CultCuestions.review_text:
         await after_get_review_message(message, state)
         return None
+
     elif current_state == CultCuestions.route_rating:
         await after_get_route_rating(message, state)
         return None
-    elif message_text in routs_all:
+
+    elif message_text in available_routes:
         await route_selection(message)
+        return None
+
+    elif message_text in closed_routes:
+        await route_being_updated(message)
         return None
 
     elif message_text.isdigit():
@@ -397,7 +414,7 @@ async def after_get_route_rating(message: Message, state: FSMContext):
         route=travel.route,
         rating_route=int(message.text)
     ).save()
-    user_feedback=list(UserFeedback.objects.filter(
+    user_feedback = list(UserFeedback.objects.filter(
         telegram_id=user.id, route=travel.route
     ))[-1]
     user_feedback.end_time_route = current_time
