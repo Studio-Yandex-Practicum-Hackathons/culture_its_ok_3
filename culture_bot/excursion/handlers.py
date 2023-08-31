@@ -237,7 +237,6 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
                 await message_answer(
                     message,
                     question_end,
-                    reply_markup=keyboard_menu
                 )
 
 
