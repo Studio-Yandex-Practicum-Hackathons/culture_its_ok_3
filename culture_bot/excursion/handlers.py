@@ -168,6 +168,7 @@ async def processing_free_content(message: Message):
             ).save()
 
         # ответ на рефлексию
+        await message_answer(message, text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION) - 1)])
         answer = Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection or None
         if answer:
             await message_answer(message, text=answer)
@@ -181,7 +182,6 @@ async def processing_free_content(message: Message):
         await start_bot(message)
         return None
 
-    await message_answer(message, text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION)-1)])
     await message_answer(message, RAITING_MESSAGE, reply_markup=keyboard_rating )
 
     return None

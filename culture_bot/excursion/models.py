@@ -1,8 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import (aspect_ratio_validator, file_size_validator,
-                         linear_image_dimensions_validator)
+from .validators import file_size_validator
 
 
 class Route(models.Model):
@@ -22,7 +21,7 @@ class Route(models.Model):
         blank=True,
         verbose_name='Карта маршрута',
         help_text='Добавьте карту маршрута',
-        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
+        validators=[file_size_validator, ]
     )
 
     cover = models.ImageField(
@@ -30,7 +29,7 @@ class Route(models.Model):
         blank=True,
         verbose_name='Обложка маршрута',
         help_text='Добавьте обложку маршрута',
-        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
+        validators=[file_size_validator, ]
     )
 
     where_start = models.TextField(
@@ -96,7 +95,11 @@ class Exhibit(models.Model):
         null=True
     )
 
-    order = models.PositiveIntegerField(default=0,)
+    order = models.PositiveIntegerField(default=0,
+                                        verbose_name='порядок в маршруте',
+                                        help_text=('при добавление нового экспоната ему '
+                                                   'присваивается последний номер, '
+                                                   'при редактирование его можно будет поменять'))
 
     def save(self):
         if self.pk is None:
@@ -126,7 +129,8 @@ class PhotoExhibit(models.Model):
     description = models.CharField(
         max_length=200,
         blank=True,
-        null=True
+        null=True,
+        verbose_name='Описание фотографии',
     )
 
     photo = models.ImageField(
@@ -134,7 +138,7 @@ class PhotoExhibit(models.Model):
         blank=True,
         verbose_name='Фотографии экспонатов',
         help_text='Добавьте картинку экспоната',
-        validators=[file_size_validator, linear_image_dimensions_validator, aspect_ratio_validator]
+        validators=[file_size_validator, ]
     )
 
 
@@ -144,7 +148,11 @@ class DescriptionExhibit(models.Model):
         on_delete=models.CASCADE,
         related_name='description_exhibit'
     )
-    text = models.TextField()
+    text = models.TextField(
+        verbose_name='Текст сообщения',
+        help_text=('каждая область - это отдельное сообщение '
+                   'которые будут идти с задержкой пропорционально длине текста, ')
+    )
 
 
 class AudioExhibit(models.Model):
@@ -157,7 +165,8 @@ class AudioExhibit(models.Model):
     description = models.CharField(
         max_length=200,
         blank=True,
-        null=True
+        null=True,
+        verbose_name='Описание аудио',
     )
 
     audio = models.FileField(upload_to='audios/')
@@ -173,7 +182,8 @@ class VideoExhibit(models.Model):
     description = models.CharField(
         max_length=200,
         blank=True,
-        null=True
+        null=True,
+        verbose_name='Описание видео',
     )
 
     video = models.FileField(upload_to='videos/')
@@ -214,13 +224,14 @@ class ReflectionExhibit(models.Model):
 
 
 class Journey(models.Model):
-    traveler = models.PositiveIntegerField()
+    traveler = models.PositiveIntegerField(verbose_name='Путешественник',)
     route = models.ForeignKey(
         Route,
         on_delete=models.CASCADE,
-        null=True
+        null=True,
+        verbose_name='Маршрут',
     )
-    now_exhibit = models.PositiveIntegerField()
+    now_exhibit = models.PositiveIntegerField(verbose_name='Номер текущего экспоната')
 
     class Meta:
         verbose_name = 'Начатое путешествие'
