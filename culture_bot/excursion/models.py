@@ -17,7 +17,7 @@ class Route(models.Model):
         default='',
     )
     route_map = models.ImageField(
-        upload_to='excursion/router_map/',
+        upload_to='route_map/',
         blank=True,
         verbose_name='Карта маршрута',
         help_text='Добавьте карту маршрута',
@@ -25,7 +25,7 @@ class Route(models.Model):
     )
 
     cover = models.ImageField(
-        upload_to='excursion/cover/',
+        upload_to='cover/',
         blank=True,
         verbose_name='Обложка маршрута',
         help_text='Добавьте обложку маршрута',
@@ -134,7 +134,7 @@ class PhotoExhibit(models.Model):
     )
 
     photo = models.ImageField(
-        upload_to='excursion/exhibit/',
+        upload_to='exhibit/',
         blank=True,
         verbose_name='Фотографии экспонатов',
         help_text='Добавьте картинку экспоната',
@@ -224,7 +224,7 @@ class ReflectionExhibit(models.Model):
 
 
 class Journey(models.Model):
-    traveler = models.PositiveIntegerField(verbose_name='Путешественник',)
+    traveler = models.BigIntegerField(verbose_name='Путешественник',)
     route = models.ForeignKey(
         Route,
         on_delete=models.CASCADE,

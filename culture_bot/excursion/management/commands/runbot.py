@@ -13,8 +13,6 @@ load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
-# TELEGRAM_TOKEN = '5575568139:AAEuNC2x_yW23LFcefoBmmsc7AZw31abqyA'
-# TELEGRAM_CHAT_ID = '350114238'
 
 
 async def main():

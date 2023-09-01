@@ -19,7 +19,7 @@ from .models import Exhibit, Journey, ReflectionExhibit, Route
 
 load_dotenv()
 
-dirname = os.path.dirname(__file__)
+dirname = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 
 router = Router()
 
@@ -109,7 +109,8 @@ async def route_selection(message: Message):
     ).save()
 
     route = Route.objects.get(title=number_map)
-    cover = FSInputFile(os.path.join(dirname, str(route.cover).replace('excursion/', '')))
+    cover = FSInputFile(os.path.join(
+        dirname, 'media', 'cover', str(route.cover).replace('cover/', '')))
     await message.answer_photo(
         cover,
         caption=route.title
@@ -124,7 +125,10 @@ async def route_selection(message: Message):
     )
 
     await message_answer(message, MAP_OF_WAY_BELOW)
-    route_map = FSInputFile(os.path.join(dirname, str(route.route_map).replace('excursion/', '')))
+    route_map = FSInputFile(os.path.join(
+        dirname, 'media', 'route_map',
+        str(route.route_map).replace('route_map/', ''))
+    )
     await message.answer_photo(
         route_map, caption=f'Карта маршрута {route.title}'
     )
@@ -306,7 +310,10 @@ async def go_next_exhibit(message: Message):
         try:
             if ex.photo_exhibit.count() > 0:
                 for i in ex.photo_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    path = os.path.join(
+                        dirname, 'media', 'exhibit',
+                        str(i.photo).replace('exhibit/', '')
+                    )
                     image_from_pc = FSInputFile(path)
                     caption = i.description if i.description else ''
                     await message.answer_photo(
@@ -321,7 +328,10 @@ async def go_next_exhibit(message: Message):
         try:
             if ex.audio_exhibit.count() > 0:
                 for i in ex.audio_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    path = os.path.join(
+                        dirname, 'media', 'audios',
+                        str(i.photo).replace('audios/', '')
+                    )
                     audio_from_pc = FSInputFile(path)
                     await message.answer_audio(
                         audio_from_pc,
@@ -334,7 +344,10 @@ async def go_next_exhibit(message: Message):
         try:
             if ex.video_exhibit.count() > 0:
                 for i in ex.video_exhibit.all():
-                    path = os.path.join(dirname, str(i.photo).replace('excursion/', ''))
+                    path = os.path.join(
+                        dirname, 'media', 'videos',
+                        str(i.photo).replace('videos/', '')
+                    )
                     video_from_pc = FSInputFile(path)
                     await message.answer_audio(
                         video_from_pc,
