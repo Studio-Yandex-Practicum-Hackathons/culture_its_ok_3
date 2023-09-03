@@ -53,11 +53,6 @@ async def message_answer(message: Message, text, **kwargs):
 @router.message(Command('start'))
 @router.message(F.text == 'Меню')
 async def start_bot(message: Message):
-    await message_answer(
-        message,
-        START_MESSAGE,
-        reply_markup=keyboard_ways(),
-    )
 
     await message_answer(
         message,
@@ -70,6 +65,7 @@ async def start_bot(message: Message):
     await message_answer(
         message,
         START_MESSAGE,
+        reply_markup=keyboard_ways(),
     )
     await message_answer(
         message,
@@ -110,7 +106,8 @@ async def route_selection(message: Message):
 
     route = Route.objects.get(title=number_map)
     cover = FSInputFile(os.path.join(
-        dirname, 'media', 'cover', str(route.cover).replace('cover/', '')))
+        dirname, 'media', str(route.cover)
+        .replace('excursion/cover/', '')))
     await message.answer_photo(
         cover,
         caption=route.title
@@ -126,8 +123,8 @@ async def route_selection(message: Message):
 
     await message_answer(message, MAP_OF_WAY_BELOW)
     route_map = FSInputFile(os.path.join(
-        dirname, 'media', 'route_map',
-        str(route.route_map).replace('route_map/', ''))
+        dirname, 'media',
+        str(route.route_map).replace('excursion/route_map/', ''))
     )
     await message.answer_photo(
         route_map, caption=f'Карта маршрута {route.title}'
@@ -268,7 +265,8 @@ async def route_being_updated(message: Message):
 async def stop_journey(message: Message):
     Journey.objects.get(traveler=message.from_user.id).delete()
     await message_answer(message,
-                         STOP_JOURNY,)
+                         STOP_JOURNY,
+                         reply_markup=keyboard_menu)
 
 
 @router.message(F.text == 'О проекте')
@@ -311,8 +309,8 @@ async def go_next_exhibit(message: Message):
             if ex.photo_exhibit.count() > 0:
                 for i in ex.photo_exhibit.all():
                     path = os.path.join(
-                        dirname, 'media', 'exhibit',
-                        str(i.photo).replace('exhibit/', '')
+                        dirname, 'media',
+                        str(i.photo).replace('excursion/exhibit/', '')
                     )
                     image_from_pc = FSInputFile(path)
                     caption = i.description if i.description else ''
@@ -329,8 +327,8 @@ async def go_next_exhibit(message: Message):
             if ex.audio_exhibit.count() > 0:
                 for i in ex.audio_exhibit.all():
                     path = os.path.join(
-                        dirname, 'media', 'audios',
-                        str(i.photo).replace('audios/', '')
+                        dirname, 'media',
+                        str(i.photo).replace('excursion/audios/', '')
                     )
                     audio_from_pc = FSInputFile(path)
                     await message.answer_audio(
@@ -345,8 +343,8 @@ async def go_next_exhibit(message: Message):
             if ex.video_exhibit.count() > 0:
                 for i in ex.video_exhibit.all():
                     path = os.path.join(
-                        dirname, 'media', 'videos',
-                        str(i.photo).replace('videos/', '')
+                        dirname, 'media',
+                        str(i.photo).replace('excursion/videos/', '')
                     )
                     video_from_pc = FSInputFile(path)
                     await message.answer_audio(
