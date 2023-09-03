@@ -35,43 +35,33 @@ async def create_dilay(text):
     await asyncio.sleep(len(text)//DIVISION_COEFFICIENT + DELAY_CONSTANT )
 
 
-async def message_answer(message: Message, text, **kwargs):
-    if '<HTML>' in text:
-        text = text.replace('<HTML>', '')
-        await message.answer(text, parse_mode='HTML', **kwargs)
-        await create_dilay(text)
-        return None
-    elif '<MarkdownV2>' in text:
-        text = text.replace('<MarkdownV2>', '')
-        await message.answer(text, parse_mode='MarkdownV2', **kwargs)
-        await create_dilay(text)
-        return None
-    await message.answer(text, **kwargs)
+async def message_answer_format_html(message: Message, text, **kwargs):
+    await message.answer(text, parse_mode='HTML', **kwargs)
     await create_dilay(text)
 
 
 @router.message(Command('start'))
 @router.message(F.text == 'Меню')
 async def start_bot(message: Message):
-    await message_answer(
+    await message_answer_format_html(
         message,
         START_MESSAGE,
         reply_markup=keyboard_ways(),
     )
 
-    await message_answer(
+    await message_answer_format_html(
         message,
         WELCOME_MESSAGE,
     )
-    await message_answer(
+    await message_answer_format_html(
         message,
         ABOUT_MESSAGE,
     )
-    await message_answer(
+    await message_answer_format_html(
         message,
         START_MESSAGE,
     )
-    await message_answer(
+    await message_answer_format_html(
         message,
         CHOISE_YOUR_WAY,
         reply_markup=keyboard_ways(),
@@ -83,10 +73,10 @@ async def not_start_place(message: Message):
     chat_id = message.from_user.id
 
     tr = Journey.objects.get(traveler=chat_id)
-    await message_answer(message, MEDITATION_ADRESS)
-    await message_answer(message, tr.route.where_start)
-    await message_answer(message, NOT_START_PLACE)
-    await message_answer(message, START_WAY_QUESTION, reply_markup=keyboard_only_ready)
+    await message_answer_format_html(message, MEDITATION_ADRESS)
+    await message_answer_format_html(message, tr.route.where_start)
+    await message_answer_format_html(message, NOT_START_PLACE)
+    await message_answer_format_html(message, START_WAY_QUESTION, reply_markup=keyboard_only_ready)
 
 
 #  выбор маршрута
@@ -114,26 +104,26 @@ async def route_selection(message: Message):
         cover,
         caption=route.title
     )
-    await message_answer(
+    await message_answer_format_html(
         message,
         text=route.lyrics,
     )
-    await message_answer(
+    await message_answer_format_html(
         message,
         text=route.description,
     )
 
-    await message_answer(message, MAP_OF_WAY_BELOW)
+    await message_answer_format_html(message, MAP_OF_WAY_BELOW)
     route_map = FSInputFile(os.path.join(dirname, str(route.route_map).replace('excursion/', '')))
     await message.answer_photo(
         route_map, caption=f'Карта маршрута {route.title}'
     )
 
     # как пройти к началу
-    await message_answer(message, route.where_start)
+    await message_answer_format_html(message, route.where_start)
 
     # 'Вы на месте?'
-    await message_answer(message, START_WAY_QUESTION, reply_markup=keyboard_ready(),)
+    await message_answer_format_html(message, START_WAY_QUESTION, reply_markup=keyboard_ready(), )
 
     return None
 
@@ -168,10 +158,10 @@ async def processing_free_content(message: Message):
             ).save()
 
         # ответ на рефлексию
-        await message_answer(message, text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION) - 1)])
+        await message_answer_format_html(message, text=RESPONSE_REFLECTION[randint(0, len(RESPONSE_REFLECTION) - 1)])
         answer = Exhibit.objects.get(route=travel.route, order=travel.now_exhibit).answer_for_reflection or None
         if answer:
-            await message_answer(message, text=answer)
+            await message_answer_format_html(message, text=answer)
 
     except ObjectDoesNotExist:
         print('Объект не сушествует')
@@ -182,7 +172,7 @@ async def processing_free_content(message: Message):
         await start_bot(message)
         return None
 
-    await message_answer(message, RAITING_MESSAGE, reply_markup=keyboard_rating )
+    await message_answer_format_html(message, RAITING_MESSAGE, reply_markup=keyboard_rating)
 
     return None
 
@@ -219,14 +209,14 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
                 travel.now_exhibit += 1
 
         if 1 <= num < 4:
-            await message_answer(message, text='Это нормально, что вам что-то не понравилось, спасибо за отзыв')
+            await message_answer_format_html(message, text='Это нормально, что вам что-то не понравилось, спасибо за отзыв')
         elif 4 <= num < 7:
-            await message_answer(message, text='Приятно видеть от вас такую оценку')
+            await message_answer_format_html(message, text='Приятно видеть от вас такую оценку')
         else:
-            await message_answer(message, text='Большое спасибо! Мы передадим вашу оценку автору :)')
+            await message_answer_format_html(message, text='Большое спасибо! Мы передадим вашу оценку автору :)')
 
         if travel.now_exhibit > count_exhibit_on_rout:
-            await message_answer(
+            await message_answer_format_html(
                 message,
                 END_OF_WAY
             )
@@ -234,7 +224,7 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
 
             if question_end:
                 # ссылка на форму обратной связи
-                await message_answer(
+                await message_answer_format_html(
                     message,
                     question_end,
                     reply_markup=keyboard_menu
@@ -242,11 +232,11 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
 
 
             # другая концовка с вводом отзыва и рейтинга
-            await message_answer(message, END_WAY_MESSAGE_2)
+            await message_answer_format_html(message, END_WAY_MESSAGE_2)
             await state.set_state(CultCuestions.review_text)
             return None
 
-        await message_answer(message, GREAT, reply_markup=keyboard_go_on_or_stop(), )
+        await message_answer_format_html(message, GREAT, reply_markup=keyboard_go_on_or_stop(), )
 
     except ObjectDoesNotExist:
         print('Объект не сушествует')
@@ -257,29 +247,29 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
 
 
 async def route_being_updated(message: Message):
-    await message_answer(message, SORRY_CLOSED_ROUTE, reply_markup=keyboard_ways())
+    await message_answer_format_html(message, SORRY_CLOSED_ROUTE, reply_markup=keyboard_ways())
 
 
 @router.message(F.text == 'Завершить медитацию')
 @router.message(Command('end'))
 async def stop_journey(message: Message):
     Journey.objects.get(traveler=message.from_user.id).delete()
-    await message_answer(message,
-                         STOP_JOURNY,)
+    await message_answer_format_html(message,
+                                     STOP_JOURNY, )
 
 
 @router.message(F.text == 'О проекте')
 async def about(message: Message):
-    await message_answer(message,
-                         ABOUT,
-                         reply_markup=keyboard_menu)
+    await message_answer_format_html(message,
+                                     ABOUT,
+                                     reply_markup=keyboard_menu)
 
 
 @router.message(F.text == 'Что ты умеешь?')
 async def what_i_an_do(message: Message):
-    await message_answer(message,
-                         WHAT_I_CAN_DO,
-                         reply_markup=keyboard_menu)
+    await message_answer_format_html(message,
+                                     WHAT_I_CAN_DO,
+                                     reply_markup=keyboard_menu)
 
 
 @router.message(F.text == 'Я готов')
@@ -295,13 +285,13 @@ async def go_next_exhibit(message: Message):
         tr.now_exhibit = tr.now_exhibit + 1
         tr.save()
 
-        await message_answer(message, text=ex.name,)
-        await message_answer(message, text=f'Художник {ex.author}', )
-        await message_answer(message, text=ex.address, )
-        await message_answer(message, text=f'как пройти:\n{ex.where_start}', )
+        await message_answer_format_html(message, text=ex.name, )
+        await message_answer_format_html(message, text=f'Художник {ex.author}', )
+        await message_answer_format_html(message, text=ex.address, )
+        await message_answer_format_html(message, text=f'как пройти:\n{ex.where_start}', )
 
         for i in ex.description_exhibit.all():
-            await message_answer(message, text=i.text)
+            await message_answer_format_html(message, text=i.text)
 
         # отправка нескольких фоток
         try:
@@ -316,7 +306,7 @@ async def go_next_exhibit(message: Message):
                     )
         except Exception as e:
             print(f'photo_exhibit: {e}')
-            await message_answer(message, OOPS_ERROR)
+            await message_answer_format_html(message, OOPS_ERROR)
 
         # отправка аудио
         try:
@@ -329,7 +319,7 @@ async def go_next_exhibit(message: Message):
                     )
         except Exception as e:
             print(f'audio_exhibit: {e}')
-            await message_answer(message, OOPS_ERROR)
+            await message_answer_format_html(message, OOPS_ERROR)
 
         # отправка видео
         try:
@@ -342,11 +332,11 @@ async def go_next_exhibit(message: Message):
                     )
         except Exception as e:
             print(f'video_exhibit: {e}')
-            await message_answer(message, OOPS_ERROR)
+            await message_answer_format_html(message, OOPS_ERROR)
 
         question_for_reflection = ex.question_for_reflection or None
         if question_for_reflection:
-            await message_answer(message, text=question_for_reflection,)
+            await message_answer_format_html(message, text=question_for_reflection, )
 
     elif tr.now_exhibit == count_exhibit_on_rout:
         tr.now_exhibit = tr.now_exhibit + 1
@@ -398,8 +388,8 @@ async def after_get_review_message(message: Message, state: FSMContext):
     if message.text:
         await state.update_data(review_text=message.text)
     await state.set_state(CultCuestions.route_rating)
-    await message_answer(message, REVIEW_THANKS)
-    await message_answer(
+    await message_answer_format_html(message, REVIEW_THANKS)
+    await message_answer_format_html(
         message,
         RAITING_REVIEW,
         reply_markup=keyboard_rating,
@@ -427,10 +417,14 @@ async def after_get_route_rating(message: Message, state: FSMContext):
     ))[-1]
     user_feedback.end_time_route = current_time
     user_feedback.save()
-    await message_answer(
+    await message_answer_format_html(
         message,
         RAITING_THANKS,
         reply_markup=keyboard_menu,
     )
     travel.delete()
     await state.clear()
+
+
+
+
