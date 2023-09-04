@@ -212,43 +212,6 @@ class VideoExhibit(models.Model):
     video = models.FileField(upload_to='videos/')
 
 
-class ReflectionExhibit(models.Model):
-    author = models.CharField(
-        max_length=20,
-        verbose_name='Комментатор',
-        validators=[html_validator, ]
-    )
-    text = models.TextField()
-    pub_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Дата публикации',
-        validators=[html_validator, ]
-    )
-    contact = models.CharField(
-        max_length=50,
-        validators=[html_validator, ]
-    )
-    exhibit = models.ForeignKey(
-        Exhibit,
-        on_delete=models.CASCADE,
-        related_name='reflection_exhibit',
-        verbose_name='Рефлексия на экспонат',
-    )
-    rating = models.IntegerField(
-        null=True,
-        blank=True,
-        validators=[MinValueValidator(1), MaxValueValidator(10)],
-        default=1
-    )
-
-    class Meta:
-        verbose_name = 'Рефлексия на экспонат'
-        verbose_name_plural = 'Рефлексия  на экспонаты'
-
-    def __str__(self):
-        return self.text[1:20]
-
-
 class Journey(models.Model):
     traveler = models.BigIntegerField(verbose_name='Путешественник',)
     route = models.ForeignKey(

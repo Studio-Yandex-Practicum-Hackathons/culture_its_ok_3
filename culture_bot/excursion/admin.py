@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
-                     PhotoExhibit, ReflectionExhibit, Route, VideoExhibit)
+                     PhotoExhibit, Route, VideoExhibit)
 
 
 class PhotoExhibitTabularInline(admin.TabularInline):
@@ -48,19 +48,6 @@ class ExhibitAdmin(admin.ModelAdmin):
     list_filter = ('name', )
     empty_value_display = '-пусто-'
     list_editable = ('route',)
-
-
-@admin.register(ReflectionExhibit)
-class ReflectionExhibitAdmin(admin.ModelAdmin):
-    list_display = (
-        'text',
-        'exhibit',
-        'author',
-        'contact',
-    )
-    search_fields = ('text', 'exhibit',)
-    list_filter = ('author', 'exhibit')
-    empty_value_display = '-пусто-'
 
 
 @admin.register(Journey)

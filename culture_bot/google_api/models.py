@@ -30,6 +30,10 @@ class ExhibitComment(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
 
+    class Meta:
+        verbose_name = 'Отзыв на экспонат'
+        verbose_name_plural = 'Отзывы  на экспонаты'
+
     def __str__(self):
         return self.text
 
@@ -44,6 +48,10 @@ class RouteReview(models.Model):
         blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
+
+    class Meta:
+        verbose_name = 'Отзыв на маршрут'
+        verbose_name_plural = 'Отзыв  на маршруты'
 
     def __str__(self):
         return self.text

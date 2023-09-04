@@ -15,7 +15,7 @@ from google_api.models import ExhibitComment, RouteReview, UserFeedback
 from .const import DELAY_CONSTANT, DIVISION_COEFFICIENT
 from .custom_keyboard import *
 from .messages import *
-from .models import Exhibit, Journey, ReflectionExhibit, Route
+from .models import Exhibit, Journey, Route
 
 load_dotenv()
 
@@ -153,13 +153,6 @@ async def processing_free_content(message: Message):
         count_exhibit_on_rout = Route.objects.get(title=travel.route.title).exhibit.count()
 
         if travel.now_exhibit <= count_exhibit_on_rout:
-            ReflectionExhibit(
-                exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
-                author=user.username,
-                contact=user.id,
-                text=message.text,
-                rating=1
-            ).save()
             ExhibitComment(
                 text=message.text,
                 user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
@@ -208,19 +201,13 @@ async def set_rating_exhibit(message: Message, state: FSMContext):
             review_rout.save()
             return None
         else:
-            refl = list(ReflectionExhibit.objects.filter(
-                exhibit=Exhibit.objects.get(route=travel.route, order=travel.now_exhibit),
-                author=user.username,
-                contact=user.id))[-1]
 
             comment = list(ExhibitComment.objects.filter(
                 user_feedback=list(UserFeedback.objects.filter(telegram_id=user.id, route=travel.route))[-1],
                 exhibit=list(Exhibit.objects.filter(route=travel.route, order=travel.now_exhibit))[-1],
                 route=travel.route))[-1]
-            refl.rating = num
             comment.rating_exhibit = num
             comment.save()
-            refl.save()
             if travel.now_exhibit == count_exhibit_on_rout:
                 travel.now_exhibit += 1
 
