@@ -1,20 +1,23 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from .validators import file_size_validator
+from .validators import file_size_validator, html_validator
 
 
 class Route(models.Model):
     title = models.CharField(
         max_length=50,
         verbose_name='Название маршрута',
+        validators=[html_validator, ]
     )
     description = models.TextField(
         verbose_name='Описание маршрута',
+        validators=[html_validator, ]
     )
     lyrics = models.TextField(
         verbose_name='Лирическое описание',
         default='',
+        validators=[html_validator, ]
     )
     route_map = models.ImageField(
         upload_to='route_map/',
@@ -34,12 +37,14 @@ class Route(models.Model):
 
     where_start = models.TextField(
         verbose_name='Как пройти к старту',
+        validators=[html_validator, ]
     )
 
     question_end = models.TextField(
         verbose_name='Вопрос в конце маршрута',
         blank=True,
         null=True,
+        validators=[html_validator, ]
     )
 
     show = models.BooleanField(
@@ -66,33 +71,39 @@ class Exhibit(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name='Название экспоната',
+        validators=[html_validator, ]
     )
     address = models.CharField(
         max_length=200,
         verbose_name='Адрес',
+        validators=[html_validator, ]
     )
 
     author = models.CharField(
         max_length=50,
         verbose_name='Художник',
+        validators=[html_validator, ]
     )
 
     question_for_reflection = models.TextField(
         verbose_name='Вопрос для рефлексии',
         null=True,
         blank=True,
+        validators=[html_validator, ]
     )
 
     answer_for_reflection = models.TextField(
         verbose_name='Ответ для рефлексии',
         null=True,
         blank=True,
+        validators=[html_validator, ]
     )
 
     where_start = models.TextField(
         verbose_name='Как пройти к экспонату',
         blank=True,
-        null=True
+        null=True,
+        validators=[html_validator, ]
     )
 
     order = models.PositiveIntegerField(default=0,
@@ -131,6 +142,7 @@ class PhotoExhibit(models.Model):
         blank=True,
         null=True,
         verbose_name='Описание фотографии',
+        validators=[html_validator, ]
     )
 
     photo = models.ImageField(
@@ -151,7 +163,8 @@ class DescriptionExhibit(models.Model):
     text = models.TextField(
         verbose_name='Текст сообщения',
         help_text=('каждая область - это отдельное сообщение '
-                   'которые будут идти с задержкой пропорционально длине текста, ')
+                   'которые будут идти с задержкой пропорционально длине текста, '),
+        validators=[html_validator, ]
     )
 
 
@@ -167,6 +180,7 @@ class AudioExhibit(models.Model):
         blank=True,
         null=True,
         verbose_name='Описание аудио',
+        validators=[html_validator, ]
     )
 
     audio = models.FileField(upload_to='audios/')
@@ -184,6 +198,7 @@ class VideoExhibit(models.Model):
         blank=True,
         null=True,
         verbose_name='Описание видео',
+        validators=[html_validator, ]
     )
 
     video = models.FileField(upload_to='videos/')
@@ -193,14 +208,17 @@ class ReflectionExhibit(models.Model):
     author = models.CharField(
         max_length=20,
         verbose_name='Комментатор',
+        validators=[html_validator, ]
     )
     text = models.TextField()
     pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата публикации',
+        validators=[html_validator, ]
     )
     contact = models.CharField(
-        max_length=50
+        max_length=50,
+        validators=[html_validator, ]
     )
     exhibit = models.ForeignKey(
         Exhibit,

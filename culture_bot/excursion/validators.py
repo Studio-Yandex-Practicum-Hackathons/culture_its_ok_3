@@ -23,3 +23,29 @@ def aspect_ratio_validator(image):
         raise ValidationError(
             [f'Соотношение сторон не должно превышать {MAX_PROPORTIONS}']
         )
+
+
+HTML_TAG = {
+    '<u>': '</u>',
+    '<del>': '</del>',
+    '<em>': '</em>',
+    '<i>': '</i>',
+    '<strong>': '</strong>',
+    '<b>': '</b>',
+    '<a href =': '</a>'
+}
+
+
+def html_validator(text):
+    for open_tag, close_tag in HTML_TAG.items():
+        if open_tag in text:
+            if close_tag not in text:
+                raise ValidationError(
+                    [f'Нет закрывающего тега: {close_tag}']
+                )
+
+        if close_tag in text:
+            if open_tag not in text:
+                raise ValidationError(
+                    [f'Нет открывающего тега: {open_tag}']
+                )
