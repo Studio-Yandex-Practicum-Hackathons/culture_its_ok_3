@@ -6,18 +6,22 @@ from .models import (AudioExhibit, DescriptionExhibit, Exhibit, Journey,
 
 class PhotoExhibitTabularInline(admin.TabularInline):
     model = PhotoExhibit
+    extra = 1
 
 
 class AudioExhibitTabularInline(admin.TabularInline):
     model = AudioExhibit
+    extra = 1
 
 
 class VideoExhibitTabularInline(admin.TabularInline):
     model = VideoExhibit
+    extra = 1
 
 
 class DescriptionExhibitTabularInline(admin.TabularInline):
     model = DescriptionExhibit
+    extra = 1
 
 
 @admin.register(Route)
